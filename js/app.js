@@ -49,6 +49,7 @@ async function loadSession() {
     .from('sessions')
     .select('*')
     .gte('date', today)
+    .neq('status', 'cancelled')
     .order('date', { ascending: true })
     .limit(1);
 
