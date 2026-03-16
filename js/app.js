@@ -190,9 +190,11 @@ rsvpForm.addEventListener('submit', async (e) => {
 
   } catch (err) {
     console.error('Checkout error:', err);
+    checkoutSection.classList.add('hidden');
+    rsvpFormSection.classList.remove('hidden');
     rsvpBtn.disabled = false;
     rsvpBtn.textContent = `RSVP & Pay $${(currentSession.price_cents / 100).toFixed(0)}`;
-    alert('Something went wrong. Please try again.');
+    alert('Error: ' + (err.message || JSON.stringify(err)));
   }
 });
 
