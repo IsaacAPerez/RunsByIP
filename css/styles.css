@@ -17,44 +17,39 @@
   to { transform: rotate(360deg); }
 }
 
-/* Subtle background texture */
+/* Subtle background glow */
 body {
   background-image: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.04) 0%, transparent 50%);
 }
 
-/* Player list items fade in */
+/* Player list fade in */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 .player-item {
   animation: fadeInUp 0.3s ease forwards;
 }
 
-/* Toast notification */
+/* Toast notification — bottom center on mobile */
 .toast {
   position: fixed;
   bottom: 1.5rem;
-  right: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
   padding: 0.75rem 1.5rem;
   border-radius: 0.75rem;
   color: #fff;
   font-weight: 500;
   font-size: 0.875rem;
   z-index: 50;
-  transform: translateY(100%);
   opacity: 0;
   transition: all 0.3s ease;
   backdrop-filter: blur(8px);
+  white-space: nowrap;
 }
 .toast.show {
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
   opacity: 1;
 }
 .toast-success { background-color: rgba(22, 163, 74, 0.9); }
@@ -63,4 +58,16 @@ body {
 /* Input focus glow */
 input:focus {
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+/* Tap highlight for buttons */
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent zoom on iOS when focusing inputs */
+@supports (-webkit-touch-callout: none) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
 }
