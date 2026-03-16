@@ -501,4 +501,7 @@ function escapeHtml(str) {
 }
 
 // Initialize
-loadSession();
+loadSession().catch(err => {
+  console.error('Failed to load session:', err);
+  showView('no-session');
+});
