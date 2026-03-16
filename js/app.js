@@ -16,14 +16,13 @@ const rsvpCount = document.getElementById('rsvp-count');
 const rsvpProgress = document.getElementById('rsvp-progress');
 const rsvpMessage = document.getElementById('rsvp-message');
 const playerList = document.getElementById('player-list');
-const rsvpFormSection = document.getElementById('rsvp-form-section');
-const rsvpForm = document.getElementById('rsvp-form');
-const rsvpBtn = document.getElementById('rsvp-btn');
-const sessionFullEl = document.getElementById('session-full');
-const paymentSection = document.getElementById('payment-section');
-const paymentBackBtn = document.getElementById('payment-back-btn');
+const checkoutSection = document.getElementById('checkout-section');
+const paymentPlaceholder = document.getElementById('payment-placeholder');
+const paymentLoading = document.getElementById('payment-loading');
+const paymentArea = document.getElementById('payment-area');
 const payBtn = document.getElementById('pay-btn');
 const paymentError = document.getElementById('payment-error');
+const sessionFullEl = document.getElementById('session-full');
 const courtDots = document.getElementById('court-dots');
 const waitlistFormSection = document.getElementById('waitlist-form-section');
 const waitlistForm = document.getElementById('waitlist-form');
@@ -31,10 +30,13 @@ const waitlistBtn = document.getElementById('wl-btn');
 const waitlistSection = document.getElementById('waitlist-section');
 const waitlistList = document.getElementById('waitlist-list');
 const weatherWidget = document.getElementById('weather-widget');
+const nameInput = document.getElementById('player-name');
+const emailInput = document.getElementById('player-email');
 
 let currentSession = null;
 let elements = null;
 let countdownInterval = null;
+let paymentReady = false;
 
 // Format date nicely
 function formatDate(dateStr) {
@@ -58,8 +60,8 @@ function showView(viewId) {
 // Parse session date + time into a Date object
 function getSessionDateTime() {
   if (!currentSession) return null;
-  const timeStr = currentSession.time; // e.g. "7:00 PM" or "7:00PM"
-  const dateStr = currentSession.date; // e.g. "2026-03-18"
+  const timeStr = currentSession.time;
+  const dateStr = currentSession.date;
   const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
   if (!match) return null;
   let hours = parseInt(match[1], 10);
@@ -168,6 +170,153 @@ function showToast(message, type) {
   setTimeout(() => { toast.classList.remove('show'); }, 3000);
 }
 
+// Simple email validation
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Auto-load Stripe payment elements when name + email are valid
+let loadingPayment = false;
+let debounceTimer = null;
+
+function checkAndLoadPayment() {
+  if (debounceTimer) clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(async () => {
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+
+    if (!name || !isValidEmail(email) || elements || loadingPayment) return;
+
+    loadingPayment = true;
+    paymentPlaceholder.classList.add('hidden');
+    paymentLoading.classList.remove('hidden');
+    paymentError.classList.add('hidden');
+
+    try {
+      const response = await db.functions.invoke('create-checkout', {
+        body: {
+          session_id: currentSession.id,
+          player_name: name,
+          player_email: email,
+        },
+      });
+
+      if (response.error) throw response.error;
+
+      const { client_secret } = response.data;
+      if (!client_secret) throw new Error('No client secret returned');
+
+      // Create Stripe Elements with dark theme
+      elements = stripe.elements({
+        clientSecret: client_secret,
+        appearance: {
+          theme: 'night',
+          variables: {
+            colorPrimary: '#f97316',
+            colorBackground: '#1f2937',
+            colorText: '#ffffff',
+            colorDanger: '#ef4444',
+            borderRadius: '12px',
+            fontFamily: 'Inter, system-ui, sans-serif',
+            spacingUnit: '4px',
+          },
+          rules: {
+            '.Input': {
+              border: '1px solid #374151',
+              backgroundColor: '#1f2937',
+              padding: '12px',
+            },
+            '.Input:focus': {
+              border: '1px solid #f97316',
+              boxShadow: '0 0 0 2px rgba(249, 115, 22, 0.2)',
+            },
+            '.Label': {
+              color: '#9ca3af',
+              marginBottom: '6px',
+            },
+          },
+        },
+      });
+
+      // Mount Payment Element
+      const paymentElement = elements.create('payment', { layout: 'tabs' });
+      paymentElement.mount('#payment-element');
+
+      paymentElement.on('ready', () => {
+        paymentReady = true;
+        payBtn.disabled = false;
+      });
+
+      // Mount Express Checkout (Apple Pay / Google Pay)
+      const expressElement = elements.create('expressCheckout', {
+        buttonType: { applePay: 'plain', googlePay: 'plain' },
+        buttonHeight: 48,
+      });
+
+      expressElement.on('ready', ({ availablePaymentMethods }) => {
+        if (availablePaymentMethods) {
+          document.getElementById('express-divider').classList.remove('hidden');
+        }
+      });
+
+      expressElement.on('confirm', async () => {
+        const { error } = await stripe.confirmPayment({
+          elements,
+          confirmParams: {
+            return_url: window.location.origin + '/success.html',
+          },
+        });
+        if (error) {
+          paymentError.textContent = error.message;
+          paymentError.classList.remove('hidden');
+        }
+      });
+
+      expressElement.mount('#express-checkout-element');
+
+      // Show payment area
+      paymentLoading.classList.add('hidden');
+      paymentArea.classList.remove('hidden');
+
+    } catch (err) {
+      console.error('Checkout error:', err);
+      paymentLoading.classList.add('hidden');
+      paymentPlaceholder.classList.remove('hidden');
+      paymentError.textContent = err.message || 'Something went wrong. Please try again.';
+      paymentError.classList.remove('hidden');
+      loadingPayment = false;
+    }
+  }, 500);
+}
+
+nameInput.addEventListener('input', checkAndLoadPayment);
+emailInput.addEventListener('input', checkAndLoadPayment);
+
+// Pay button — confirm payment
+payBtn.addEventListener('click', async () => {
+  if (!elements || !paymentReady) return;
+
+  payBtn.disabled = true;
+  payBtn.innerHTML = '<span class="spinner"></span>';
+  paymentError.classList.add('hidden');
+
+  const { error } = await stripe.confirmPayment({
+    elements,
+    confirmParams: {
+      return_url: window.location.origin + '/success.html',
+    },
+  });
+
+  // Only reaches here if there's an error (otherwise redirects)
+  if (error) {
+    paymentError.textContent = error.message;
+    paymentError.classList.remove('hidden');
+  }
+
+  payBtn.disabled = false;
+  payBtn.textContent = `RSVP & Pay $${(currentSession.price_cents / 100).toFixed(0)}`;
+});
+
 // Load the next upcoming session
 async function loadSession() {
   const today = new Date().toISOString().split('T')[0];
@@ -243,7 +392,7 @@ function updateRSVPDisplay(rsvps, waitlisted) {
 
   if (count >= max) {
     rsvpMessage.textContent = 'Session is full!';
-    rsvpFormSection.classList.add('hidden');
+    checkoutSection.classList.add('hidden');
     sessionFullEl.classList.add('hidden');
     waitlistFormSection.classList.remove('hidden');
     rsvpProgress.className = 'bg-gradient-to-r from-orange-500 to-orange-400 h-3.5 rounded-full progress-fill';
@@ -251,13 +400,13 @@ function updateRSVPDisplay(rsvps, waitlisted) {
     rsvpMessage.textContent = `Session confirmed! ${max - count} spot${max - count !== 1 ? 's' : ''} left.`;
     rsvpProgress.className = 'bg-gradient-to-r from-green-500 to-green-400 h-3.5 rounded-full progress-fill';
     waitlistFormSection.classList.add('hidden');
-    rsvpFormSection.classList.remove('hidden');
+    checkoutSection.classList.remove('hidden');
   } else {
     const needed = min - count;
     rsvpMessage.textContent = `${needed} more player${needed !== 1 ? 's' : ''} needed to confirm!`;
     rsvpProgress.className = 'bg-gradient-to-r from-orange-500 to-orange-400 h-3.5 rounded-full progress-fill';
     waitlistFormSection.classList.add('hidden');
-    rsvpFormSection.classList.remove('hidden');
+    checkoutSection.classList.remove('hidden');
   }
 
   // Confirmed players list
@@ -310,145 +459,6 @@ function subscribeToRSVPs() {
     })
     .subscribe();
 }
-
-// Handle RSVP form — get PaymentIntent and show payment UI
-rsvpForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const name = document.getElementById('player-name').value.trim();
-  const email = document.getElementById('player-email').value.trim();
-  if (!name || !email) return;
-
-  rsvpBtn.disabled = true;
-  rsvpBtn.innerHTML = '<span class="spinner"></span>';
-  paymentError.classList.add('hidden');
-
-  try {
-    const response = await db.functions.invoke('create-checkout', {
-      body: {
-        session_id: currentSession.id,
-        player_name: name,
-        player_email: email,
-      },
-    });
-
-    if (response.error) throw response.error;
-
-    const { client_secret } = response.data;
-    if (!client_secret) throw new Error('No client secret returned');
-
-    // Create Stripe Elements with dark theme
-    elements = stripe.elements({
-      clientSecret: client_secret,
-      appearance: {
-        theme: 'night',
-        variables: {
-          colorPrimary: '#f97316',
-          colorBackground: '#1f2937',
-          colorText: '#ffffff',
-          colorDanger: '#ef4444',
-          borderRadius: '12px',
-          fontFamily: 'Inter, system-ui, sans-serif',
-          spacingUnit: '4px',
-        },
-        rules: {
-          '.Input': {
-            border: '1px solid #374151',
-            backgroundColor: '#1f2937',
-            padding: '12px',
-          },
-          '.Input:focus': {
-            border: '1px solid #f97316',
-            boxShadow: '0 0 0 2px rgba(249, 115, 22, 0.2)',
-          },
-          '.Label': {
-            color: '#9ca3af',
-            marginBottom: '6px',
-          },
-        },
-      },
-    });
-
-    // Mount Payment Element (card form)
-    const paymentElement = elements.create('payment', { layout: 'tabs' });
-    paymentElement.mount('#payment-element');
-
-    // Mount Express Checkout (Apple Pay / Google Pay)
-    const expressElement = elements.create('expressCheckout', {
-      buttonType: { applePay: 'plain', googlePay: 'plain' },
-      buttonHeight: 48,
-    });
-
-    expressElement.on('ready', ({ availablePaymentMethods }) => {
-      if (availablePaymentMethods) {
-        document.getElementById('express-divider').classList.remove('hidden');
-      }
-    });
-
-    expressElement.on('confirm', async () => {
-      const { error } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: window.location.origin + '/success.html',
-        },
-      });
-      if (error) {
-        paymentError.textContent = error.message;
-        paymentError.classList.remove('hidden');
-      }
-    });
-
-    expressElement.mount('#express-checkout-element');
-
-    // Show payment section, hide form
-    rsvpFormSection.classList.add('hidden');
-    paymentSection.classList.remove('hidden');
-
-  } catch (err) {
-    console.error('Checkout error:', err);
-    rsvpBtn.disabled = false;
-    rsvpBtn.textContent = `RSVP & Pay $${(currentSession.price_cents / 100).toFixed(0)}`;
-    paymentError.textContent = err.message || 'Something went wrong. Please try again.';
-    paymentError.classList.remove('hidden');
-  }
-});
-
-// Pay button — confirm card payment
-payBtn.addEventListener('click', async () => {
-  if (!elements) return;
-
-  payBtn.disabled = true;
-  payBtn.innerHTML = '<span class="spinner"></span>';
-  paymentError.classList.add('hidden');
-
-  const { error } = await stripe.confirmPayment({
-    elements,
-    confirmParams: {
-      return_url: window.location.origin + '/success.html',
-    },
-  });
-
-  if (error) {
-    paymentError.textContent = error.message;
-    paymentError.classList.remove('hidden');
-  }
-
-  payBtn.disabled = false;
-  payBtn.textContent = `Pay $${(currentSession.price_cents / 100).toFixed(0)}`;
-});
-
-// Back button — return to RSVP form
-paymentBackBtn.addEventListener('click', () => {
-  paymentSection.classList.add('hidden');
-  rsvpFormSection.classList.remove('hidden');
-  rsvpBtn.disabled = false;
-  rsvpBtn.textContent = `RSVP & Pay $${(currentSession.price_cents / 100).toFixed(0)}`;
-  paymentError.classList.add('hidden');
-  document.getElementById('payment-element').innerHTML = '';
-  document.getElementById('express-checkout-element').innerHTML = '';
-  document.getElementById('express-divider').classList.add('hidden');
-  elements = null;
-});
 
 // Waitlist form handler
 waitlistForm.addEventListener('submit', async (e) => {
