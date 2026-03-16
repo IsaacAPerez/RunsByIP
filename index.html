@@ -19,6 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body class="bg-gray-950 text-white min-h-screen font-sans">
 
@@ -162,6 +163,15 @@
             RSVP & Pay $10
           </button>
         </form>
+      </div>
+
+      <!-- Embedded Checkout -->
+      <div id="checkout-section" class="hidden bg-gray-900/80 rounded-2xl border border-gray-800 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-lg">Complete Payment</h3>
+          <button id="checkout-back-btn" class="text-sm text-gray-400 hover:text-white transition-colors">&larr; Back</button>
+        </div>
+        <div id="checkout-container"></div>
       </div>
 
       <!-- Session Full -->

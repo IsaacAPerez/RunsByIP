@@ -70,21 +70,21 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Determine success URL base from Origin or Referer header
     const origin =
       req.headers.get("origin") ||
       req.headers.get("referer")?.replace(/\/[^/]*$/, "") ||
-      "https://example.com";
+      "https://runsbyip.com";
 
-    // Create Stripe Checkout session
+    // Create Stripe Checkout session in embedded mode
     const checkoutSession = await stripe.checkout.sessions.create({
+      ui_mode: "embedded",
       mode: "payment",
       line_items: [
         {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `RunsByIP — ${session.date}`,
+              name: `RunsByIP \u2014 ${session.date}`,
               description: `${session.time} at ${session.location}`,
             },
             unit_amount: session.price_cents,
@@ -93,8 +93,7 @@ Deno.serve(async (req: Request) => {
         },
       ],
       customer_email: player_email,
-      success_url: `${origin}/success.html`,
-      cancel_url: `${origin}/index.html`,
+      return_url: `${origin}/success.html`,
       metadata: {
         session_id,
         player_name,
@@ -123,7 +122,7 @@ Deno.serve(async (req: Request) => {
     }
 
     return new Response(
-      JSON.stringify({ checkout_url: checkoutSession.url }),
+      JSON.stringify({ client_secret: checkoutSession.client_secret }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },

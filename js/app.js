@@ -19,8 +19,12 @@ const rsvpFormSection = document.getElementById('rsvp-form-section');
 const rsvpForm = document.getElementById('rsvp-form');
 const rsvpBtn = document.getElementById('rsvp-btn');
 const sessionFullEl = document.getElementById('session-full');
+const checkoutSection = document.getElementById('checkout-section');
+const checkoutContainer = document.getElementById('checkout-container');
+const checkoutBackBtn = document.getElementById('checkout-back-btn');
 
 let currentSession = null;
+let embeddedCheckout = null;
 
 // Format date nicely
 function formatDate(dateStr) {
@@ -59,11 +63,6 @@ async function loadSession() {
   }
 
   currentSession = sessions[0];
-
-  if (currentSession.status === 'cancelled') {
-    showView('cancelled-session');
-    return;
-  }
 
   // Populate session details
   sessionDate.textContent = formatDate(currentSession.date);
@@ -154,7 +153,7 @@ function subscribeToRSVPs() {
     .subscribe();
 }
 
-// Handle RSVP form submission
+// Handle RSVP form submission — show embedded checkout
 rsvpForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -163,7 +162,6 @@ rsvpForm.addEventListener('submit', async (e) => {
 
   if (!name || !email) return;
 
-  // Disable button, show loading
   rsvpBtn.disabled = true;
   rsvpBtn.innerHTML = '<span class="spinner"></span>';
 
@@ -178,18 +176,36 @@ rsvpForm.addEventListener('submit', async (e) => {
 
     if (response.error) throw response.error;
 
-    const { checkout_url } = response.data;
-    if (checkout_url) {
-      window.location.href = checkout_url;
-    } else {
-      throw new Error('No checkout URL returned');
-    }
+    const { client_secret } = response.data;
+    if (!client_secret) throw new Error('No client secret returned');
+
+    // Hide form, show checkout
+    rsvpFormSection.classList.add('hidden');
+    checkoutSection.classList.remove('hidden');
+
+    // Mount embedded checkout
+    const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+    embeddedCheckout = await stripe.initEmbeddedCheckout({ clientSecret: client_secret });
+    embeddedCheckout.mount('#checkout-container');
+
   } catch (err) {
     console.error('Checkout error:', err);
     rsvpBtn.disabled = false;
     rsvpBtn.textContent = `RSVP & Pay $${(currentSession.price_cents / 100).toFixed(0)}`;
     alert('Something went wrong. Please try again.');
   }
+});
+
+// Back button — destroy checkout, show form again
+checkoutBackBtn.addEventListener('click', () => {
+  if (embeddedCheckout) {
+    embeddedCheckout.destroy();
+    embeddedCheckout = null;
+  }
+  checkoutSection.classList.add('hidden');
+  rsvpFormSection.classList.remove('hidden');
+  rsvpBtn.disabled = false;
+  rsvpBtn.textContent = `RSVP & Pay $${(currentSession.price_cents / 100).toFixed(0)}`;
 });
 
 // Escape HTML to prevent XSS
