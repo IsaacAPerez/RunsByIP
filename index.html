@@ -124,8 +124,15 @@
 
     <!-- Loading State -->
     <div id="loading" class="text-center py-12">
-      <div class="spinner mx-auto mb-4" style="border-color: rgba(255,255,255,0.1); border-top-color: #f97316; width: 36px; height: 36px; border-width: 3px;"></div>
-      <p class="text-gray-500 text-sm">Loading session...</p>
+      <div id="loading-spinner">
+        <div class="spinner mx-auto mb-4" style="border-color: rgba(255,255,255,0.1); border-top-color: #f97316; width: 36px; height: 36px; border-width: 3px;"></div>
+        <p class="text-gray-500 text-sm">Loading session...</p>
+      </div>
+      <div id="loading-fallback" class="hidden">
+        <p class="text-white font-semibold mb-2">Having trouble loading?</p>
+        <p class="text-gray-400 text-sm mb-4">Instagram's browser doesn't play nice. Open in your real browser:</p>
+        <a id="open-in-browser" href="" class="inline-block bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold py-3 px-6 rounded-xl text-sm">Open in Safari</a>
+      </div>
     </div>
 
     <!-- No Session State -->
@@ -394,6 +401,6 @@
   <div id="toast" class="toast"></div>
 
   <script src="js/config.js"></script>
-  <script src="js/app.js?v=7"></script>
+  <script src="js/app.js?v=8"></script>
 </body>
 </html>

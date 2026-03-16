@@ -535,7 +535,35 @@ document.getElementById('install-btn').addEventListener('click', async () => {
   deferredPrompt = null;
 });
 
+// Detect in-app browsers and show fallback after timeout
+function setupLoadingFallback() {
+  const isInApp = /Instagram|FBAN|FBAV|Twitter|Line\//i.test(navigator.userAgent);
+  const timeout = isInApp ? 3000 : 8000;
+  setTimeout(() => {
+    const loading = document.getElementById('loading');
+    if (!loading.classList.contains('hidden')) {
+      document.getElementById('loading-spinner').classList.add('hidden');
+      const fallback = document.getElementById('loading-fallback');
+      fallback.classList.remove('hidden');
+      const link = document.getElementById('open-in-browser');
+      link.href = window.location.href;
+      // iOS: open in Safari via intent
+      if (/iPhone|iPad/i.test(navigator.userAgent)) {
+        link.textContent = 'Open in Safari';
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.open(window.location.href, '_blank');
+        });
+      } else {
+        link.textContent = 'Open in Browser';
+        link.href = 'intent://' + window.location.host + window.location.pathname + '#Intent;scheme=https;end';
+      }
+    }
+  }, timeout);
+}
+
 // Initialize
+setupLoadingFallback();
 loadSession().catch(err => {
   console.error('Failed to load session:', err);
   showView('no-session');
