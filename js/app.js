@@ -504,20 +504,22 @@ document.getElementById('share-btn').addEventListener('click', async () => {
 let currentRSVPs = [];
 
 document.getElementById('randomize-btn').addEventListener('click', () => {
-  if (currentRSVPs.length < 2) return;
+  if (currentRSVPs.length < 3) return;
 
   const shuffled = [...currentRSVPs].sort(() => Math.random() - 0.5);
-  const mid = Math.ceil(shuffled.length / 2);
-  const team1 = shuffled.slice(0, mid);
-  const team2 = shuffled.slice(mid);
+  const size = Math.ceil(shuffled.length / 3);
+  const team1 = shuffled.slice(0, size);
+  const team2 = shuffled.slice(size, size * 2);
+  const team3 = shuffled.slice(size * 2);
 
-  const teamsDisplay = document.getElementById('teams-display');
-  teamsDisplay.classList.remove('hidden');
+  document.getElementById('teams-display').classList.remove('hidden');
 
   document.getElementById('team-1').innerHTML = team1
     .map(r => `<p class="text-sm text-orange-300">${escapeHtml(r.player_name)}</p>`).join('');
   document.getElementById('team-2').innerHTML = team2
     .map(r => `<p class="text-sm text-blue-300">${escapeHtml(r.player_name)}</p>`).join('');
+  document.getElementById('team-3').innerHTML = team3
+    .map(r => `<p class="text-sm text-green-300">${escapeHtml(r.player_name)}</p>`).join('');
 });
 
 // ---- PWA Install ----
