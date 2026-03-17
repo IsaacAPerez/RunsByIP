@@ -310,7 +310,6 @@ async function loadSession() {
     sessionStatusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-blue-500/15 text-blue-400 border border-blue-500/20';
   }
 
-  if (window.__clearLoadingFallback) window.__clearLoadingFallback();
   showView('session-card');
   updatePaymentsState();
   startCountdown();
