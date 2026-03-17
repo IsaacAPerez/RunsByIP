@@ -156,14 +156,27 @@
         }
 
         function copyLink(btn){
-          navigator.clipboard.writeText(siteUrl).then(function(){
-            btn.textContent='Copied!';
-            btn.style.background='#22c55e';
-            setTimeout(function(){
-              btn.textContent='Copy Link';
-              btn.style.background='linear-gradient(to right,#f97316,#ea580c)';
-            },2000);
-          });
+          var copied=false;
+          try{
+            var ta=document.createElement('textarea');
+            ta.value=siteUrl;
+            ta.style.cssText='position:fixed;left:-9999px;top:-9999px;';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            copied=document.execCommand('copy');
+            document.body.removeChild(ta);
+          }catch(e){}
+          if(!copied&&navigator.clipboard){
+            navigator.clipboard.writeText(siteUrl).catch(function(){});
+            copied=true;
+          }
+          btn.textContent=copied?'Copied! Now paste in Safari':'runsbyip.com';
+          btn.style.background=copied?'#22c55e':'#374151';
+          setTimeout(function(){
+            btn.textContent='Copy Link';
+            btn.style.background='linear-gradient(to right,#f97316,#ea580c)';
+          },3000);
         }
 
         function showFallback(html){
@@ -487,6 +500,6 @@
   <div id="toast" class="toast"></div>
 
   <script src="js/config.js"></script>
-  <script src="js/app.js?v=13"></script>
+  <script src="js/app.js?v=14"></script>
 </body>
 </html>
