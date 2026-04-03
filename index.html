@@ -76,135 +76,44 @@
 
   <!-- Hero -->
   <section class="border-b border-surface-light/30">
-    <div class="max-w-2xl mx-auto px-5 py-12 sm:py-24">
-      <p class="hero-title">
-        WEEKLY <span class="slash">/</span><br>
-        PICKUP <span class="slash">/</span><br>
-        BASKETBALL<span class="text-court-orange">.</span>
-      </p>
-      <p class="text-gray-500 text-base sm:text-lg mt-6 max-w-sm">
-        RSVP online, pay $10, and show up ready to hoop. Every Wednesday in LA.
-      </p>
-      <a href="#next-session" class="inline-flex items-center gap-2 mt-8 text-white font-semibold text-sm uppercase tracking-wider border border-white/30 hover:border-white px-6 py-3 rounded-lg transition-colors">
-        This Week's Session
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-      </a>
-    </div>
-  </section>
+    <div class="max-w-2xl mx-auto px-5 py-10 sm:py-16">
+      <div class="hero-shell">
+        <div class="hero-copy">
+          <span class="hero-eyebrow">Wednesday runs · Los Angeles</span>
+          <p class="hero-title">
+            PULL UP FOR<br>
+            THE NEXT RUN<span class="text-court-orange">.</span>
+          </p>
+          <p class="text-gray-400 text-base sm:text-lg mt-5 max-w-lg leading-relaxed">
+            RunsByIP keeps pickup simple: see the next session, lock your spot, and show up to a real indoor run with actual hoopers.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 mt-7">
+            <a href="#next-session" class="inline-flex items-center justify-center gap-2 bg-court-orange hover:bg-orange-600 text-white font-semibold text-sm uppercase tracking-wider px-6 py-3.5 rounded-xl transition-colors">
+              See This Week's Run
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+            <a href="#how-it-works" class="inline-flex items-center justify-center gap-2 text-white font-semibold text-sm uppercase tracking-wider border border-white/15 hover:border-white/40 px-6 py-3.5 rounded-xl transition-colors">
+              How It Works
+            </a>
+          </div>
+        </div>
 
-  <!-- Community Pulse -->
-  <section class="border-b border-surface-light/30">
-    <div class="max-w-2xl mx-auto px-5 py-6 sm:py-8">
-      <div class="grid grid-cols-3 gap-3 sm:gap-4">
-        <div class="stat-card">
-          <p class="stat-value">WED</p>
-          <p class="stat-label">Weekly run cadence</p>
-        </div>
-        <div class="stat-card">
-          <p class="stat-value">$10</p>
-          <p class="stat-label">To lock your spot</p>
-        </div>
-        <div class="stat-card">
-          <p class="stat-value">5v5</p>
-          <p class="stat-label">Full-court energy</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Highlights -->
-  <section class="border-b border-surface-light/30">
-    <div class="max-w-2xl mx-auto px-5 py-10 sm:py-12 space-y-6">
-      <div class="flex items-end justify-between gap-4">
-        <div>
-          <h3 class="section-label mb-2">Highlights</h3>
-          <p class="text-white text-xl sm:text-2xl font-display font-bold uppercase tracking-tight">See the pace before you pull up.</p>
-        </div>
-        <p class="hidden sm:block text-sm text-gray-500 max-w-xs text-right">Short-form clips, clean gym runs, and a better sense of the vibe than a dead empty landing page ever could.</p>
-      </div>
-
-      <div class="featured-highlight">
-        <div class="video-shell featured-video-shell">
-          <iframe src="https://www.youtube.com/embed/SPkqLVbNf_I?rel=0&modestbranding=1&playsinline=1" title="RunsByIP featured highlight" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-        </div>
-        <div class="featured-highlight-copy">
-          <span class="highlight-chip">Featured run</span>
-          <h4 class="text-xl sm:text-2xl font-display font-bold uppercase tracking-tight">Real runs. Real buckets. No mystery gym energy.</h4>
-          <p class="text-sm sm:text-base text-gray-400 leading-relaxed">If you’re checking from your phone, start here. The featured clip gives the page an instant pulse, then the rest of the tape is one swipe away.</p>
-          <div class="flex flex-wrap gap-2 text-xs uppercase tracking-[0.18em] text-gray-500">
-            <span class="highlight-meta">Los Angeles</span>
-            <span class="highlight-meta">Wednesday nights</span>
-            <span class="highlight-meta">Indoor pickup</span>
+        <div class="hero-panel">
+          <p class="section-label mb-3">Why players pull up</p>
+          <div class="quick-grid">
+            <div class="quick-card">
+              <p class="quick-value">Weekly</p>
+              <p class="quick-label">Consistent Wednesday cadence, not random last-minute chaos.</p>
+            </div>
+            <div class="quick-card">
+              <p class="quick-value">$10</p>
+              <p class="quick-label">One clean RSVP flow to lock in your spot.</p>
+            </div>
+            <div class="quick-card quick-card-wide">
+              <p class="quick-value">Indoor 5v5</p>
+              <p class="quick-label">Real gym runs, good pace, and enough structure to know what you’re walking into.</p>
+            </div>
           </div>
-        </div>
-      </div>
-
-      <div class="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory highlight-rail" style="-webkit-overflow-scrolling: touch; scrollbar-width: none;">
-        <article class="highlight-card snap-start">
-          <div class="video-shell">
-            <iframe src="https://www.youtube.com/embed/El-05R5z48A?rel=0&modestbranding=1&playsinline=1" title="RunsByIP highlight 2" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-          </div>
-          <div class="p-3 sm:p-4">
-            <p class="text-xs uppercase tracking-[0.18em] text-court-orange mb-1">Clip 02</p>
-            <p class="text-sm text-gray-300">Quick pace, good turnout, actual hoopers.</p>
-          </div>
-        </article>
-        <article class="highlight-card snap-start">
-          <div class="video-shell">
-            <iframe src="https://www.youtube.com/embed/FMFt1NnByuI?rel=0&modestbranding=1&playsinline=1" title="RunsByIP highlight 3" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-          </div>
-          <div class="p-3 sm:p-4">
-            <p class="text-xs uppercase tracking-[0.18em] text-court-orange mb-1">Clip 03</p>
-            <p class="text-sm text-gray-300">Buckets, spacing, and a gym that doesn’t feel random.</p>
-          </div>
-        </article>
-        <article class="highlight-card snap-start">
-          <div class="video-shell">
-            <iframe src="https://www.youtube.com/embed/4WZO8K4uBOU?rel=0&modestbranding=1&playsinline=1" title="RunsByIP highlight 4" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-          </div>
-          <div class="p-3 sm:p-4">
-            <p class="text-xs uppercase tracking-[0.18em] text-court-orange mb-1">Clip 04</p>
-            <p class="text-sm text-gray-300">More game tape, less guessing whether the run is worth it.</p>
-          </div>
-        </article>
-        <article class="highlight-card snap-start">
-          <div class="video-shell">
-            <iframe src="https://www.youtube.com/embed/PS-q1cazuHY?rel=0&modestbranding=1&playsinline=1" title="RunsByIP highlight 5" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-          </div>
-          <div class="p-3 sm:p-4">
-            <p class="text-xs uppercase tracking-[0.18em] text-court-orange mb-1">Clip 05</p>
-            <p class="text-sm text-gray-300">A mobile-first tape rail that finally gives the home page some life.</p>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- How It Works -->
-  <section class="border-b border-surface-light/30">
-    <div class="max-w-2xl mx-auto px-5 py-10 sm:py-14">
-      <div class="flex items-end justify-between gap-4 mb-6 sm:mb-10">
-        <div>
-          <h3 class="section-label mb-2">How It Works</h3>
-          <p class="text-white text-xl sm:text-2xl font-display font-bold uppercase tracking-tight">Simple flow. No group-chat chaos.</p>
-        </div>
-        <p class="hidden sm:block text-sm text-gray-500 max-w-xs text-right">Reserve, pay, and pull up. The product should feel as clean as the process.</p>
-      </div>
-      <div class="grid gap-3 sm:grid-cols-3 sm:gap-8">
-        <div class="info-card">
-          <span class="step-number">01</span>
-          <h4 class="font-display font-bold text-base mt-3 mb-2 uppercase tracking-wide">RSVP</h4>
-          <p class="text-sm text-gray-500 leading-relaxed">Enter your name and email to reserve your spot for the week.</p>
-        </div>
-        <div class="info-card">
-          <span class="step-number">02</span>
-          <h4 class="font-display font-bold text-base mt-3 mb-2 uppercase tracking-wide">Pay $10</h4>
-          <p class="text-sm text-gray-500 leading-relaxed">Secure checkout powered by Stripe. Covers your share of the gym.</p>
-        </div>
-        <div class="info-card">
-          <span class="step-number">03</span>
-          <h4 class="font-display font-bold text-base mt-3 mb-2 uppercase tracking-wide">Show Up</h4>
-          <p class="text-sm text-gray-500 leading-relaxed">You're locked in. Show up Wednesday and get straight to the runs.</p>
         </div>
       </div>
     </div>
@@ -212,7 +121,13 @@
 
   <main class="max-w-2xl mx-auto px-5 py-8 sm:py-10" id="next-session">
 
-    <h3 class="section-label mb-5 text-center">Next Session</h3>
+    <div class="flex items-end justify-between gap-4 mb-5">
+      <div>
+        <h3 class="section-label mb-2">Live Run Board</h3>
+        <p class="text-white text-2xl sm:text-3xl font-display font-bold uppercase tracking-tight">Next session, no digging.</p>
+      </div>
+      <p class="hidden sm:block text-sm text-gray-500 max-w-xs text-right">The useful part belongs first: who’s in, what it costs, and whether spots are still open.</p>
+    </div>
 
     <!-- Loading State -->
     <div id="loading" class="text-center py-12">
@@ -528,6 +443,67 @@
 
     <div class="h-8 sm:h-0"></div>
   </main>
+
+  <section id="how-it-works" class="border-t border-surface-light/30">
+    <div class="max-w-2xl mx-auto px-5 py-10 sm:py-12">
+      <div class="flex items-end justify-between gap-4 mb-6">
+        <div>
+          <h3 class="section-label mb-2">How It Works</h3>
+          <p class="text-white text-xl sm:text-2xl font-display font-bold uppercase tracking-tight">Simple, fast, and way less annoying.</p>
+        </div>
+        <p class="hidden sm:block text-sm text-gray-500 max-w-xs text-right">This should feel like joining a run, not filling out a tax form.</p>
+      </div>
+      <div class="steps-row">
+        <div class="info-card">
+          <span class="step-number">01</span>
+          <h4 class="font-display font-bold text-base mt-3 mb-2 uppercase tracking-wide">Check the run</h4>
+          <p class="text-sm text-gray-500 leading-relaxed">See the date, time, location, and how full the session is before you commit.</p>
+        </div>
+        <div class="info-card">
+          <span class="step-number">02</span>
+          <h4 class="font-display font-bold text-base mt-3 mb-2 uppercase tracking-wide">Reserve your spot</h4>
+          <p class="text-sm text-gray-500 leading-relaxed">Enter your info and pay online when spots are open. No chasing payments in the group chat.</p>
+        </div>
+        <div class="info-card">
+          <span class="step-number">03</span>
+          <h4 class="font-display font-bold text-base mt-3 mb-2 uppercase tracking-wide">Pull up ready</h4>
+          <p class="text-sm text-gray-500 leading-relaxed">Once you’re in, just show up Wednesday and hoop. That’s the whole point.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-surface-light/30">
+    <div class="max-w-2xl mx-auto px-5 py-10 sm:py-12">
+      <div class="flex items-end justify-between gap-4 mb-6">
+        <div>
+          <h3 class="section-label mb-2">Recent Run Energy</h3>
+          <p class="text-white text-xl sm:text-2xl font-display font-bold uppercase tracking-tight">Enough tape to feel the vibe.</p>
+        </div>
+        <p class="hidden sm:block text-sm text-gray-500 max-w-xs text-right">Two clips is plenty. Show the run, don’t turn the homepage into YouTube trying out for a mixtape.</p>
+      </div>
+      <div class="mini-highlight-grid">
+        <article class="mini-highlight-card">
+          <div class="video-shell mini-video-shell">
+            <iframe src="https://www.youtube.com/embed/SPkqLVbNf_I?rel=0&modestbranding=1&playsinline=1" title="RunsByIP featured highlight" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+          </div>
+          <div class="p-4">
+            <p class="text-xs uppercase tracking-[0.18em] text-court-orange mb-2">Featured clip</p>
+            <p class="text-sm text-gray-300 leading-relaxed">Clean indoor run, good turnout, and the kind of pace people actually want to join.</p>
+          </div>
+        </article>
+        <article class="mini-highlight-card">
+          <div class="video-shell mini-video-shell">
+            <iframe src="https://www.youtube.com/embed/El-05R5z48A?rel=0&modestbranding=1&playsinline=1" title="RunsByIP second highlight" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+          </div>
+          <div class="p-4">
+            <p class="text-xs uppercase tracking-[0.18em] text-court-orange mb-2">Another look</p>
+            <p class="text-sm text-gray-300 leading-relaxed">A quick second angle so new players can tell this isn’t a mystery gym situation.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
 
   <!-- About Section -->
   <section class="border-t border-surface-light/30">

@@ -285,13 +285,29 @@ payBtn.addEventListener('click', handlePayment);
 async function loadSession() {
   const today = new Date().toISOString().split('T')[0];
 
-  const { data: sessions, error } = await db
+  const { data: activeSessions, error: activeError } = await db
     .from('sessions')
     .select('*')
     .gte('date', today)
     .neq('status', 'cancelled')
+    .eq('payments_open', true)
     .order('date', { ascending: true })
     .limit(1);
+
+  let sessions = activeSessions;
+  let error = activeError;
+
+  if (!sessions || sessions.length === 0) {
+    const fallback = await db
+      .from('sessions')
+      .select('*')
+      .gte('date', today)
+      .neq('status', 'cancelled')
+      .order('date', { ascending: true })
+      .limit(1);
+    sessions = fallback.data;
+    error = fallback.error;
+  }
 
   if (error || !sessions || sessions.length === 0) {
     showView('no-session');
