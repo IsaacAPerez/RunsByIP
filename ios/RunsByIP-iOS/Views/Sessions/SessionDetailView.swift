@@ -105,7 +105,7 @@ struct SessionDetailView: View {
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 14)
                                     .background(Color.appAccentOrange)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(.appBackground)
                                     .cornerRadius(AppStyle.buttonCornerRadius)
                             }
                         }
@@ -123,7 +123,6 @@ struct SessionDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarColorScheme(.dark, for: .navigationBar)
         .sheet(isPresented: $showRSVP) {
             RSVPView(session: session)
         }

@@ -140,7 +140,7 @@ struct POWCard: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(poll.winnerName ?? "")
-                    .font(.system(size: 28, weight: .black, design: .rounded))
+                    .font(.system(size: 28, weight: .black).width(.condensed))
                     .foregroundColor(Color(hex: "FFD700"))
 
                 if let votes = poll.winnerVotes {
@@ -221,7 +221,7 @@ private struct PlayerChip: View {
 
                 if voteCount > 0 {
                     Text("\(voteCount)")
-                        .font(.system(size: 13, weight: .black, design: .rounded))
+                        .font(.system(size: 13, weight: .black).width(.condensed))
                         .foregroundColor(.appAccentOrange)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)

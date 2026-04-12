@@ -141,7 +141,7 @@ struct SessionCardView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
                             .background(Color.appAccentOrange)
-                            .foregroundColor(.white)
+                            .foregroundColor(.appBackground)
                             .cornerRadius(10)
                     }
                 }

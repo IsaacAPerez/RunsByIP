@@ -18,11 +18,50 @@ struct RunsByIPApp: App {
     init() {
         STPAPIClient.shared.publishableKey = StripeConfig.publishableKey
         UIApplication.shared.registerForRemoteNotifications()
+        configureAppearance()
+    }
+
+    private func configureAppearance() {
+        let condensed = UIFont.systemFont(ofSize: 17, weight: .regular, width: .condensed)
+
+        // Navigation bar
+        let navAppearance = UINavigationBarAppearance()
+        navAppearance.configureWithOpaqueBackground()
+        navAppearance.backgroundColor = UIColor(Color(hex: "000000"))
+        navAppearance.titleTextAttributes = [
+            .font: UIFont.systemFont(ofSize: 17, weight: .semibold, width: .condensed),
+            .foregroundColor: UIColor.white
+        ]
+        navAppearance.largeTitleTextAttributes = [
+            .font: UIFont.systemFont(ofSize: 34, weight: .bold, width: .condensed),
+            .foregroundColor: UIColor.white
+        ]
+        UINavigationBar.appearance().prefersLargeTitles = false
+        UINavigationBar.appearance().standardAppearance = navAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = navAppearance
+        UINavigationBar.appearance().compactAppearance = navAppearance
+
+        // Tab bar
+        let tabFont = UIFont.systemFont(ofSize: 10, weight: .medium, width: .condensed)
+        let tabAppearance = UITabBarAppearance()
+        tabAppearance.configureWithOpaqueBackground()
+        tabAppearance.backgroundColor = UIColor(Color(hex: "000000"))
+
+        let itemAppearance = UITabBarItemAppearance()
+        itemAppearance.normal.titleTextAttributes = [.font: tabFont, .foregroundColor: UIColor(Color(hex: "666666"))]
+        itemAppearance.selected.titleTextAttributes = [.font: tabFont, .foregroundColor: UIColor.white]
+        tabAppearance.stackedLayoutAppearance = itemAppearance
+        tabAppearance.inlineLayoutAppearance = itemAppearance
+        tabAppearance.compactInlineLayoutAppearance = itemAppearance
+
+        UITabBar.appearance().standardAppearance = tabAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabAppearance
     }
 
     var body: some Scene {
         WindowGroup {
             RootView()
+                .fontWidth(.condensed)
                 .environmentObject(authService)
                 .environmentObject(sessionService)
                 .environmentObject(chatService)

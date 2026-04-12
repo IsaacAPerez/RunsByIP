@@ -201,6 +201,32 @@ final class ChatService: ObservableObject {
         }
     }
 
+    // MARK: - Mute
+
+    func toggleMute(userId: String, muted: Bool) async throws {
+        try await supabase
+            .from("profiles")
+            .update(["is_muted": muted])
+            .eq("id", value: userId)
+            .execute()
+    }
+
+    func checkMuteStatus() async -> Bool {
+        guard let uid = await currentUserId else { return false }
+        do {
+            let profile: UserProfile = try await supabase
+                .from("profiles")
+                .select()
+                .eq("id", value: uid)
+                .single()
+                .execute()
+                .value
+            return profile.isMuted
+        } catch {
+            return false
+        }
+    }
+
     func fetchAllUsers() async throws -> [UserProfile] {
         do {
             return try await supabase

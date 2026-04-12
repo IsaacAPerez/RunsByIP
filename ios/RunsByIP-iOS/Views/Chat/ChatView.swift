@@ -15,6 +15,7 @@ struct ChatView: View {
     @State private var selectedPhotoData: Data?
     @State private var typingResetTask: Task<Void, Never>?
     @State private var showMembers = false
+    @State private var isMuted = false
 
     private var typingIndicatorText: String? {
         let names = chatService.typingUsers.map(\.displayName)
@@ -85,95 +86,106 @@ struct ChatView: View {
                     }
 
                     VStack(spacing: 10) {
-                        if let typingIndicatorText {
+                        if isMuted {
                             HStack(spacing: 8) {
-                                TypingDotsView()
-                                Text(typingIndicatorText)
-                                    .font(.caption)
+                                Image(systemName: "speaker.slash.fill")
                                     .foregroundColor(.appTextSecondary)
-                                Spacer()
+                                Text("You've been muted")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundColor(.appTextSecondary)
                             }
-                            .padding(.horizontal)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                        }
-
-                        if let selectedPhotoPreview {
-                            HStack(spacing: 12) {
-                                Image(uiImage: selectedPhotoPreview)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 56, height: 56)
-                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("Photo ready")
-                                        .font(.subheadline.bold())
-                                        .foregroundColor(.white)
-                                    Text("Attachments are photo-only for now.")
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                        } else {
+                            if let typingIndicatorText {
+                                HStack(spacing: 8) {
+                                    TypingDotsView()
+                                    Text(typingIndicatorText)
                                         .font(.caption)
                                         .foregroundColor(.appTextSecondary)
+                                    Spacer()
                                 }
-
-                                Spacer()
-
-                                Button {
-                                    clearSelectedPhoto()
-                                } label: {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .font(.title3)
-                                        .foregroundColor(.white.opacity(0.7))
-                                }
-                            }
-                            .padding(12)
-                            .background(Color.appSurface)
-                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                            .padding(.horizontal)
-                        }
-
-                        HStack(alignment: .bottom, spacing: 12) {
-                            PhotosPicker(selection: $selectedPhotoItem, matching: .images, photoLibrary: .shared()) {
-                                Image(systemName: selectedPhotoPreview == nil ? "photo.on.rectangle.angled" : "photo.fill")
-                                    .font(.system(size: 20, weight: .semibold))
-                                    .foregroundColor(selectedPhotoPreview == nil ? .white.opacity(0.72) : .appAccentOrange)
-                                    .frame(width: 42, height: 42)
-                                    .background(Color.appSurface, in: Circle())
-                                    .overlay(
-                                        Circle()
-                                            .stroke(Color.appBorder, lineWidth: 1)
-                                    )
+                                .padding(.horizontal)
+                                .transition(.move(edge: .bottom).combined(with: .opacity))
                             }
 
-                            TextField(selectedPhotoPreview == nil ? "Message..." : "Add a caption...", text: $messageText, axis: .vertical)
-                                .lineLimit(1...4)
+                            if let selectedPhotoPreview {
+                                HStack(spacing: 12) {
+                                    Image(uiImage: selectedPhotoPreview)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 56, height: 56)
+                                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Photo ready")
+                                            .font(.subheadline.bold())
+                                            .foregroundColor(.white)
+                                        Text("Attachments are photo-only for now.")
+                                            .font(.caption)
+                                            .foregroundColor(.appTextSecondary)
+                                    }
+
+                                    Spacer()
+
+                                    Button {
+                                        clearSelectedPhoto()
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.title3)
+                                            .foregroundColor(.white.opacity(0.7))
+                                    }
+                                }
                                 .padding(12)
                                 .background(Color.appSurface)
-                                .foregroundColor(.white)
-                                .cornerRadius(20)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.appBorder, lineWidth: 1)
-                                )
-                                .onChange(of: messageText) { _, newValue in
-                                    handleComposerChange(newValue)
+                                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                                .padding(.horizontal)
+                            }
+
+                            HStack(alignment: .bottom, spacing: 12) {
+                                PhotosPicker(selection: $selectedPhotoItem, matching: .images, photoLibrary: .shared()) {
+                                    Image(systemName: selectedPhotoPreview == nil ? "photo.on.rectangle.angled" : "photo.fill")
+                                        .font(.system(size: 20, weight: .semibold))
+                                        .foregroundColor(selectedPhotoPreview == nil ? .white.opacity(0.72) : .appAccentOrange)
+                                        .frame(width: 42, height: 42)
+                                        .background(Color.appSurface, in: Circle())
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.appBorder, lineWidth: 1)
+                                        )
                                 }
 
-                            Button {
-                                sendMessage()
-                            } label: {
-                                Image(systemName: "arrow.up.circle.fill")
-                                    .font(.system(size: 34))
-                                    .foregroundColor(canSendMessage ? .appAccentOrange : .appTextSecondary)
+                                TextField(selectedPhotoPreview == nil ? "Message..." : "Add a caption...", text: $messageText, axis: .vertical)
+                                    .lineLimit(1...4)
+                                    .padding(12)
+                                    .background(Color.appSurface)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(20)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 20)
+                                            .stroke(Color.appBorder, lineWidth: 1)
+                                    )
+                                    .onChange(of: messageText) { _, newValue in
+                                        handleComposerChange(newValue)
+                                    }
+
+                                Button {
+                                    sendMessage()
+                                } label: {
+                                    Image(systemName: "arrow.up.circle.fill")
+                                        .font(.system(size: 34))
+                                        .foregroundColor(canSendMessage ? .appAccentOrange : .appTextSecondary)
+                                }
+                                .disabled(!canSendMessage)
                             }
-                            .disabled(!canSendMessage)
+                            .padding(.horizontal)
+                            .padding(.vertical, 10)
                         }
-                        .padding(.horizontal)
-                        .padding(.vertical, 10)
                     }
                     .background(Color.appBackground)
                 }
             }
-            .navigationTitle("Chat")
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .condensedNavTitle("Chat")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -187,6 +199,7 @@ struct ChatView: View {
             .sheet(isPresented: $showMembers) {
                 MembersListView()
                     .environmentObject(chatService)
+                    .environmentObject(authService)
             }
             .task {
                 await loadChat()
@@ -223,6 +236,7 @@ struct ChatView: View {
 
     private func loadChat() async {
         currentUserId = await chatService.currentUserId
+        isMuted = await chatService.checkMuteStatus()
         do {
             try await chatService.fetchMessages()
             chatService.subscribeToMessages()
@@ -355,11 +369,14 @@ private struct TypingDotsView: View {
 
 struct MembersListView: View {
     @EnvironmentObject var chatService: ChatService
+    @EnvironmentObject var authService: AuthService
     @Environment(\.dismiss) var dismiss
 
     @State private var users: [UserProfile] = []
     @State private var isLoading = true
     @State private var selectedUser: UserProfile?
+
+    private var isAdmin: Bool { authService.isAdmin }
 
     var body: some View {
         NavigationStack {
@@ -379,7 +396,9 @@ struct MembersListView: View {
                         Button {
                             selectedUser = user
                         } label: {
-                            MemberRow(user: user)
+                            MemberRow(user: user, isAdmin: isAdmin) {
+                                toggleMute(user: user)
+                            }
                         }
                         .listRowBackground(Color.appSurface)
                         .listRowSeparatorTint(Color.appBorder)
@@ -388,10 +407,8 @@ struct MembersListView: View {
                     .scrollContentBackground(.hidden)
                 }
             }
-            .navigationTitle("Members")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
+            .condensedNavTitle("Members")
+                        .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") { dismiss() }
                         .foregroundColor(.appAccentOrange)
@@ -415,12 +432,24 @@ struct MembersListView: View {
             }
         }
     }
+
+    private func toggleMute(user: UserProfile) {
+        let newMuted = !user.isMuted
+        Task {
+            try? await chatService.toggleMute(userId: user.id, muted: newMuted)
+            if let idx = users.firstIndex(where: { $0.id == user.id }) {
+                users = try await chatService.fetchAllUsers()
+            }
+        }
+    }
 }
 
 // MARK: - Member Row
 
 private struct MemberRow: View {
     let user: UserProfile
+    var isAdmin: Bool = false
+    var onToggleMute: (() -> Void)?
 
     private var joinDate: String {
         guard let createdAt = user.createdAt else { return "" }
@@ -441,9 +470,17 @@ private struct MemberRow: View {
             )
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(user.displayName ?? "Player")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.white)
+                HStack(spacing: 6) {
+                    Text(user.displayName ?? "Player")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+
+                    if user.isMuted {
+                        Image(systemName: "speaker.slash.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(.red.opacity(0.8))
+                    }
+                }
 
                 if !joinDate.isEmpty {
                     Text(joinDate)
@@ -453,6 +490,20 @@ private struct MemberRow: View {
             }
 
             Spacer()
+
+            if isAdmin && user.role != "admin" {
+                Button {
+                    onToggleMute?()
+                } label: {
+                    Image(systemName: user.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                        .font(.system(size: 16))
+                        .foregroundColor(user.isMuted ? .red : .appTextSecondary)
+                        .frame(width: 36, height: 36)
+                        .background(user.isMuted ? Color.red.opacity(0.15) : Color.appSurface)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+            }
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 12, weight: .semibold))

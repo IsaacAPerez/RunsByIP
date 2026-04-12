@@ -157,12 +157,37 @@ struct UserProfile: Codable, Identifiable {
     let avatarUrl: String?
     let role: String
     let createdAt: String?
+    let isMuted: Bool
 
     enum CodingKeys: String, CodingKey {
         case id, email, role, bio
         case displayName = "display_name"
         case avatarUrl = "avatar_url"
         case createdAt = "created_at"
+        case isMuted = "is_muted"
+    }
+
+    init(id: String, email: String?, displayName: String?, bio: String?, avatarUrl: String?, role: String, createdAt: String?, isMuted: Bool = false) {
+        self.id = id
+        self.email = email
+        self.displayName = displayName
+        self.bio = bio
+        self.avatarUrl = avatarUrl
+        self.role = role
+        self.createdAt = createdAt
+        self.isMuted = isMuted
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        email = try container.decodeIfPresent(String.self, forKey: .email)
+        displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
+        bio = try container.decodeIfPresent(String.self, forKey: .bio)
+        avatarUrl = try container.decodeIfPresent(String.self, forKey: .avatarUrl)
+        role = try container.decode(String.self, forKey: .role)
+        createdAt = try container.decodeIfPresent(String.self, forKey: .createdAt)
+        isMuted = try container.decodeIfPresent(Bool.self, forKey: .isMuted) ?? false
     }
 }
 

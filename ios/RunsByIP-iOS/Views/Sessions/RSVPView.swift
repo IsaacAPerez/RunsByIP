@@ -109,7 +109,7 @@ struct RSVPView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 14)
                                 .background(Color.appAccentOrange)
-                                .foregroundColor(.white)
+                                .foregroundColor(.appBackground)
                                 .cornerRadius(10)
                             }
                             .disabled(isLoading || paymentService.isProcessing || !isFormValid)

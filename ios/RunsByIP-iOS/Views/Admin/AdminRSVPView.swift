@@ -139,8 +139,7 @@ struct AdminRSVPView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarColorScheme(.dark, for: .navigationBar)
-        .confirmationDialog("Cancel Session?", isPresented: $showCancelConfirm) {
+                .confirmationDialog("Cancel Session?", isPresented: $showCancelConfirm) {
             Button("Cancel Session", role: .destructive) {
                 cancelSession()
             }

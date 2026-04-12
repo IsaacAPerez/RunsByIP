@@ -39,9 +39,8 @@ struct SessionsListView: View {
                     }
                 }
             }
-            .navigationTitle("Sessions")
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .task {
+            .condensedNavTitle("Sessions")
+                        .task {
                 await loadSessions()
             }
             .refreshable {

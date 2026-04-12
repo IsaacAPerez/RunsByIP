@@ -154,7 +154,7 @@ struct MessageBubbleView: View {
                 if message.hasText {
                     Text(message.content)
                         .font(.body)
-                        .foregroundColor(.white)
+                        .foregroundColor(isCurrentUser ? .appBackground : .white)
                         .multilineTextAlignment(.leading)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 10)

@@ -7,6 +7,7 @@ struct HomeView: View {
     @EnvironmentObject var powService: POWService
 
     @State private var isLoading = true
+    @State private var hasLoadedOnce = false
     @State private var errorMessage: String?
     @State private var showRSVP = false
     @State private var showAllRuns = false
@@ -128,7 +129,7 @@ struct HomeView: View {
     }
 
     private func loadData() async {
-        isLoading = true
+        if !hasLoadedOnce { isLoading = true }
         errorMessage = nil
         do {
             try await sessionService.fetchCurrentSession()
@@ -140,6 +141,7 @@ struct HomeView: View {
             errorMessage = error.localizedDescription
         }
         isLoading = false
+        hasLoadedOnce = true
     }
 }
 
@@ -163,7 +165,7 @@ private struct HomeHeader: View {
                     .foregroundColor(.appTextSecondary)
 
                 Text(hasUpcomingSession ? "Next run, \(firstName)." : "Stay ready, \(firstName).")
-                    .font(.system(size: 30, weight: .black, design: .rounded))
+                    .font(.system(size: 30, weight: .black).width(.condensed))
                     .foregroundColor(.white)
                     .fixedSize(horizontal: false, vertical: true)
 
@@ -210,7 +212,7 @@ private struct NextRunCard: View {
                         .foregroundColor(.appTextSecondary)
 
                     Text(session.formattedDate)
-                        .font(.system(size: 28, weight: .black, design: .rounded))
+                        .font(.system(size: 28, weight: .black).width(.condensed))
                         .foregroundColor(.white)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -267,7 +269,7 @@ private struct NextRunCard: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 15)
                     .background(spotsLeft == 0 ? Color.appSurfaceElevated : Color.appAccentOrange)
-                    .foregroundColor(.white)
+                    .foregroundColor(spotsLeft == 0 ? .white : .appBackground)
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
             .buttonStyle(.plain)
@@ -312,7 +314,7 @@ private struct StatusPill: View {
                 .foregroundColor(.appTextSecondary)
 
             Text(value)
-                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .font(.system(size: 17, weight: .bold).width(.condensed))
                 .foregroundColor(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -375,7 +377,7 @@ private struct MostConsistentCard: View {
                                 .frame(width: 28)
                         } else {
                             Text("\(index + 1)")
-                                .font(.system(size: 14, weight: .bold, design: .rounded))
+                                .font(.system(size: 14, weight: .bold).width(.condensed))
                                 .foregroundColor(.appTextTertiary)
                                 .frame(width: 28)
                         }
@@ -388,7 +390,7 @@ private struct MostConsistentCard: View {
                         Spacer()
 
                         Text("\(entry.gameCount)")
-                            .font(.system(size: 18, weight: .black, design: .rounded))
+                            .font(.system(size: 18, weight: .black).width(.condensed))
                             .foregroundColor(.appAccentOrange)
 
                         Text(entry.gameCount == 1 ? "game" : "games")

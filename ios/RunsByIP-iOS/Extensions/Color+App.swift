@@ -4,21 +4,21 @@ import SwiftUI
 
 extension Color {
     // Backgrounds
-    static let appBackground = Color(hex: "0A0A0A")
-    static let appSurface = Color(hex: "1A1A1E")
-    static let appSurfaceElevated = Color(hex: "222228")
+    static let appBackground = Color(hex: "000000")
+    static let appSurface = Color(hex: "0F0F0F")
+    static let appSurfaceElevated = Color(hex: "161616")
 
     // Accent
-    static let appAccent = Color(hex: "F5F0E8")
-    static let appAccentOrange = Color(hex: "FF8C42")
+    static let appAccent = Color(hex: "FFFFFF")
+    static let appAccentOrange = Color(hex: "FFFFFF")
 
     // Text
     static let appTextPrimary = Color.white
-    static let appTextSecondary = Color(hex: "8E8E93")
-    static let appTextTertiary = Color(hex: "48484A")
+    static let appTextSecondary = Color(hex: "666666")
+    static let appTextTertiary = Color(hex: "333333")
 
     // Border
-    static let appBorder = Color(hex: "2C2C2E")
+    static let appBorder = Color(hex: "1A1A1A")
 
     // Semantic
     static let appSuccess = Color(hex: "34C759")
@@ -56,6 +56,30 @@ enum AppStyle {
     static let badgeCornerRadius: CGFloat = 12
 }
 
+// MARK: - Condensed Nav Title
+
+struct CondensedNavTitle: ViewModifier {
+    let title: String
+
+    func body(content: Content) -> some View {
+        content
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(title)
+                        .font(.system(size: 17, weight: .semibold).width(.condensed))
+                        .foregroundColor(.white)
+                }
+            }
+    }
+}
+
+extension View {
+    func condensedNavTitle(_ title: String) -> some View {
+        modifier(CondensedNavTitle(title: title))
+    }
+}
+
 // MARK: - Card Modifier
 
 struct AppCardModifier: ViewModifier {
@@ -87,7 +111,7 @@ struct AppPrimaryButtonStyle: ButtonStyle {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
             .background(isDisabled ? Color.appSurfaceElevated : Color.appAccentOrange)
-            .foregroundColor(.white)
+            .foregroundColor(isDisabled ? .white : .appBackground)
             .clipShape(RoundedRectangle(cornerRadius: AppStyle.buttonCornerRadius, style: .continuous))
             .opacity(configuration.isPressed ? 0.85 : 1)
     }

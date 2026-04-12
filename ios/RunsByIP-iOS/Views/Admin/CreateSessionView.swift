@@ -142,7 +142,7 @@ struct CreateSessionView: View {
                         } label: {
                             HStack {
                                 if isLoading {
-                                    ProgressView().tint(.white).scaleEffect(0.8)
+                                    ProgressView().tint(.appBackground).scaleEffect(0.8)
                                 } else {
                                     Text("Create Session")
                                         .fontWeight(.semibold)
@@ -151,7 +151,7 @@ struct CreateSessionView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
                             .background(Color.appAccentOrange)
-                            .foregroundColor(.white)
+                            .foregroundColor(.appBackground)
                             .cornerRadius(AppStyle.buttonCornerRadius)
                         }
                         .disabled(isLoading || location.isEmpty)
@@ -160,10 +160,8 @@ struct CreateSessionView: View {
                     .padding(24)
                 }
             }
-            .navigationTitle("New Session")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
+            .condensedNavTitle("New Session")
+                        .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") { dismiss() }
                         .foregroundColor(.appAccentOrange)

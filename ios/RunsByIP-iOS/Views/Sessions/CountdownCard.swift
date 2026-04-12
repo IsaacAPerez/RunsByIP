@@ -56,7 +56,7 @@ struct CountdownCard: View {
                 // Countdown or Live
                 if isLive {
                     Text("HAPPENING NOW")
-                        .font(.system(size: 28, weight: .black, design: .rounded))
+                        .font(.system(size: 28, weight: .black).width(.condensed))
                         .foregroundColor(.white)
                 } else if let c = countdownComponents {
                     HStack(spacing: 4) {
@@ -107,12 +107,12 @@ private struct CountdownCardUnit: View {
     var body: some View {
         HStack(spacing: 1) {
             Text("\(value)")
-                .font(.system(size: 34, weight: .black, design: .rounded))
+                .font(.system(size: 34, weight: .black).width(.condensed))
                 .foregroundColor(.white)
                 .monospacedDigit()
 
             Text(label)
-                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .font(.system(size: 18, weight: .bold).width(.condensed))
                 .foregroundColor(.appAccentOrange)
                 .padding(.top, 8)
         }
@@ -138,7 +138,7 @@ private struct LiveBadge: View {
                 )
 
             Text("LIVE NOW")
-                .font(.system(size: 11, weight: .black, design: .rounded))
+                .font(.system(size: 11, weight: .black).width(.condensed))
                 .tracking(1.0)
                 .foregroundColor(.appSuccess)
         }
@@ -166,7 +166,7 @@ struct EmptyCountdownCard: View {
                     .foregroundColor(.appTextSecondary)
 
                 Text("No sessions scheduled")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .font(.system(size: 20, weight: .bold).width(.condensed))
                     .foregroundColor(.appTextSecondary)
 
                 Text("Check back soon for the next run.")

@@ -54,7 +54,7 @@ struct AdminDashboardView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 14)
                                 .background(Color.appAccentOrange)
-                                .foregroundColor(.white)
+                                .foregroundColor(.appBackground)
                                 .cornerRadius(AppStyle.buttonCornerRadius)
                             }
                             .padding(.horizontal)
@@ -162,6 +162,71 @@ struct AdminDashboardView: View {
                                     DevInfoRow(label: "Email", value: authService.currentProfile?.email ?? "—")
                                     DevInfoRow(label: "App Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
                                     DevInfoRow(label: "Build", value: Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—")
+
+                                    Divider().background(Color.appBorder)
+
+                                    HStack(spacing: 8) {
+                                        NavigationLink {
+                                            FontPreviewView()
+                                        } label: {
+                                            HStack {
+                                                Image(systemName: "textformat")
+                                                Text("Fonts")
+                                                    .fontWeight(.semibold)
+                                            }
+                                            .font(.system(size: 14))
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, 10)
+                                            .background(Color.appSurfaceElevated)
+                                            .foregroundColor(.appAccentOrange)
+                                            .cornerRadius(AppStyle.buttonCornerRadius)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: AppStyle.buttonCornerRadius)
+                                                    .stroke(Color.appBorder, lineWidth: 1)
+                                            )
+                                        }
+
+                                        NavigationLink {
+                                            ColorPreviewView()
+                                        } label: {
+                                            HStack {
+                                                Image(systemName: "paintpalette")
+                                                Text("Colors")
+                                                    .fontWeight(.semibold)
+                                            }
+                                            .font(.system(size: 14))
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, 10)
+                                            .background(Color.appSurfaceElevated)
+                                            .foregroundColor(.appAccentOrange)
+                                            .cornerRadius(AppStyle.buttonCornerRadius)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: AppStyle.buttonCornerRadius)
+                                                    .stroke(Color.appBorder, lineWidth: 1)
+                                            )
+                                        }
+                                    }
+
+                                    Button {
+                                        UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+                                        showToast("Onboarding reset — relaunch app")
+                                    } label: {
+                                        HStack {
+                                            Image(systemName: "arrow.counterclockwise")
+                                            Text("Reset Onboarding")
+                                                .fontWeight(.semibold)
+                                        }
+                                        .font(.system(size: 14))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 10)
+                                        .background(Color.appSurfaceElevated)
+                                        .foregroundColor(.appAccentOrange)
+                                        .cornerRadius(AppStyle.buttonCornerRadius)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: AppStyle.buttonCornerRadius)
+                                                .stroke(Color.appBorder, lineWidth: 1)
+                                        )
+                                    }
                                 }
                             }
 
@@ -196,8 +261,7 @@ struct AdminDashboardView: View {
                     }
                 }
             }
-            .navigationTitle("Admin")
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .condensedNavTitle("Admin")
             .sheet(isPresented: $showCreateSession) {
                 CreateSessionView()
                     .onDisappear { Task { await loadData() } }

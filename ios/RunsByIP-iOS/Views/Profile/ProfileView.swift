@@ -97,9 +97,7 @@ struct ProfileView: View {
                     }
                 }
             }
-            .navigationTitle("Profile")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .condensedNavTitle("Profile")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if isSaving {
@@ -326,7 +324,7 @@ struct ProfileView: View {
                         .foregroundColor(.appTextSecondary)
                 }
             }
-            .toggleStyle(SwitchToggleStyle(tint: .appAccentOrange))
+            .toggleStyle(SwitchToggleStyle(tint: .appTextSecondary))
             .padding(16)
             .background(Color.appSurfaceElevated, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
 

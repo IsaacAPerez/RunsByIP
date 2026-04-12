@@ -41,7 +41,7 @@ struct OnboardingView: View {
                             .frame(width: 8, height: 8)
                     }
                 }
-                .padding(.bottom, 24)
+                .padding(.bottom, AppSpacing.space24)
 
                 // Navigation buttons
                 if currentPage < totalPages - 1 && currentPage != 3 {
@@ -54,11 +54,11 @@ struct OnboardingView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 15)
                             .background(Color.appAccentOrange)
-                            .foregroundColor(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .foregroundColor(.appBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: AppStyle.buttonCornerRadius, style: .continuous))
                     }
                     .buttonStyle(.plain)
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, AppSpacing.space24)
                     .padding(.bottom, 40)
                 } else if currentPage == totalPages - 1 {
                     Button {
@@ -70,11 +70,11 @@ struct OnboardingView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 15)
                             .background(Color.appAccentOrange)
-                            .foregroundColor(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .foregroundColor(.appBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: AppStyle.buttonCornerRadius, style: .continuous))
                     }
                     .buttonStyle(.plain)
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, AppSpacing.space24)
                     .padding(.bottom, 40)
                 }
             }
@@ -85,48 +85,42 @@ struct OnboardingView: View {
     // MARK: - Pages
 
     private var welcomePage: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: AppSpacing.space24) {
             Spacer()
 
-            if let appIcon = UIImage(named: "AppIcon") {
-                Image(uiImage: appIcon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 120, height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-                    .shadow(color: .appAccentOrange.opacity(0.3), radius: 20, y: 8)
-            } else {
-                Image(systemName: "basketball.fill")
-                    .font(.system(size: 80))
-                    .foregroundColor(.appAccentOrange)
-            }
+            Image("AppIconImage")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 120, height: 120)
+                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                .shadow(color: .appAccentOrange.opacity(0.3), radius: 20, y: 8)
 
             VStack(spacing: 10) {
                 Text("RunsByIP")
-                    .font(.system(size: 36, weight: .black, design: .rounded))
-                    .foregroundColor(.white)
+                    .font(.system(size: 38, weight: .black).width(.condensed))
+                    .foregroundColor(.appTextPrimary)
 
                 Text("Weekly pickup basketball in LA")
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.appBody)
                     .foregroundColor(.appTextSecondary)
             }
 
             Spacer()
             Spacer()
         }
-        .padding(.horizontal, 32)
+        .padding(.horizontal, AppSpacing.space32)
     }
 
     private var howItWorksPage: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: AppSpacing.space32) {
             Spacer()
 
             Text("HOW IT WORKS")
-                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                .font(.appMono)
                 .tracking(1.6)
                 .foregroundColor(.appTextSecondary)
 
-            VStack(spacing: 24) {
+            VStack(spacing: AppSpacing.space24) {
                 OnboardingStep(number: "1", text: "RSVP & pay $10")
                 OnboardingStep(number: "2", text: "Show up and hoop")
                 OnboardingStep(number: "3", text: "Every Wednesday night")
@@ -139,11 +133,11 @@ struct OnboardingView: View {
             Spacer()
             Spacer()
         }
-        .padding(.horizontal, 32)
+        .padding(.horizontal, AppSpacing.space32)
     }
 
     private var notificationsPage: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: AppSpacing.space24) {
             Spacer()
 
             Image(systemName: "bell.badge.fill")
@@ -152,39 +146,39 @@ struct OnboardingView: View {
 
             VStack(spacing: 10) {
                 Text("Stay in the loop")
-                    .font(.system(size: 28, weight: .black, design: .rounded))
-                    .foregroundColor(.white)
+                    .font(.appTitle)
+                    .foregroundColor(.appTextPrimary)
 
                 Text("Get notified when new sessions drop, spots open up, and the crew is chatting.")
-                    .font(.system(size: 16))
+                    .font(.appBody)
                     .foregroundColor(.appTextSecondary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, AppSpacing.space16)
             }
 
             if !notificationGranted {
                 Button {
                     requestNotifications()
                 } label: {
-                    HStack(spacing: 8) {
+                    HStack(spacing: AppSpacing.space8) {
                         Image(systemName: "bell.fill")
                         Text("ENABLE NOTIFICATIONS")
                             .font(.system(size: 13, weight: .black))
                             .tracking(1.0)
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, AppSpacing.space24)
                     .padding(.vertical, 14)
                     .background(Color.appSurfaceElevated)
                     .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: AppStyle.buttonCornerRadius, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        RoundedRectangle(cornerRadius: AppStyle.buttonCornerRadius, style: .continuous)
                             .stroke(Color.appBorder, lineWidth: 1)
                     )
                 }
                 .buttonStyle(.plain)
             } else {
-                HStack(spacing: 8) {
+                HStack(spacing: AppSpacing.space8) {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.appSuccess)
                     Text("Notifications enabled")
@@ -196,25 +190,25 @@ struct OnboardingView: View {
             Spacer()
             Spacer()
         }
-        .padding(.horizontal, 32)
+        .padding(.horizontal, AppSpacing.space32)
     }
 
     private var profileSetupPage: some View {
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 24) {
+                VStack(spacing: AppSpacing.space24) {
                     Spacer().frame(height: 40)
 
                     VStack(spacing: 10) {
                         Text("Set up your profile")
-                            .font(.system(size: 28, weight: .black, design: .rounded))
-                            .foregroundColor(.white)
+                            .font(.appTitle)
+                            .foregroundColor(.appTextPrimary)
 
                         Text("Add a photo and bio so the crew can recognize you.")
-                            .font(.system(size: 16))
+                            .font(.appBody)
                             .foregroundColor(.appTextSecondary)
                             .multilineTextAlignment(.center)
-                            .padding(.horizontal, 16)
+                            .padding(.horizontal, AppSpacing.space16)
                     }
 
                     // Avatar picker
@@ -251,11 +245,11 @@ struct OnboardingView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         HStack {
                             Text("Bio")
-                                .font(.caption)
+                                .font(.appCaption)
                                 .foregroundColor(.appTextSecondary)
                             Spacer()
                             Text("\(bio.count)/\(bioCharacterLimit)")
-                                .font(.caption)
+                                .font(.appCaption)
                                 .foregroundColor(.appTextSecondary)
                         }
 
@@ -264,38 +258,38 @@ struct OnboardingView: View {
                             .foregroundColor(.white)
                             .padding(14)
                             .background(Color.appSurfaceElevated)
-                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .clipShape(RoundedRectangle(cornerRadius: AppStyle.buttonCornerRadius, style: .continuous))
                             .onChange(of: bio) { _, newValue in
                                 if newValue.count > bioCharacterLimit {
                                     bio = String(newValue.prefix(bioCharacterLimit))
                                 }
                             }
                     }
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, AppSpacing.space8)
 
                     if let profileError {
-                        HStack(spacing: 8) {
+                        HStack(spacing: AppSpacing.space8) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundColor(.appError)
                             Text(profileError)
-                                .font(.caption)
+                                .font(.appCaption)
                                 .foregroundColor(.white)
                             Spacer(minLength: 0)
                         }
                         .padding(14)
-                        .background(Color.appError.opacity(0.12), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .background(Color.appError.opacity(0.12), in: RoundedRectangle(cornerRadius: AppStyle.cornerRadius, style: .continuous))
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, AppSpacing.space24)
             }
 
-            VStack(spacing: 12) {
+            VStack(spacing: AppSpacing.space12) {
                 Button {
                     saveProfileAndContinue()
                 } label: {
                     Group {
                         if isSaving {
-                            ProgressView().tint(.white)
+                            ProgressView().tint(.appBackground)
                         } else {
                             Text("SAVE & CONTINUE")
                                 .font(.system(size: 15, weight: .black))
@@ -305,8 +299,8 @@ struct OnboardingView: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 15)
                     .background(Color.appAccentOrange)
-                    .foregroundColor(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .foregroundColor(.appBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: AppStyle.buttonCornerRadius, style: .continuous))
                 }
                 .buttonStyle(.plain)
                 .disabled(isSaving)
@@ -320,7 +314,7 @@ struct OnboardingView: View {
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, AppSpacing.space24)
             .padding(.bottom, 40)
         }
         .onChange(of: selectedPhoto) { _, item in
@@ -337,27 +331,30 @@ struct OnboardingView: View {
     }
 
     private var donePage: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: AppSpacing.space24) {
             Spacer()
 
-            Image(systemName: "figure.basketball")
-                .font(.system(size: 70))
-                .foregroundColor(.appAccentOrange)
+            Image("AppIconImage")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 100, height: 100)
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .shadow(color: .appAccentOrange.opacity(0.3), radius: 16, y: 6)
 
             VStack(spacing: 10) {
                 Text("You're in.")
-                    .font(.system(size: 36, weight: .black, design: .rounded))
-                    .foregroundColor(.white)
+                    .font(.system(size: 38, weight: .black).width(.condensed))
+                    .foregroundColor(.appTextPrimary)
 
                 Text("Let's hoop.")
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .font(.system(size: 22, weight: .bold).width(.condensed))
                     .foregroundColor(.appAccentOrange)
             }
 
             Spacer()
             Spacer()
         }
-        .padding(.horizontal, 32)
+        .padding(.horizontal, AppSpacing.space32)
     }
 
     // MARK: - Actions
@@ -416,17 +413,17 @@ private struct OnboardingStep: View {
     let text: String
 
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: AppSpacing.space16) {
             Text(number)
-                .font(.system(size: 22, weight: .black, design: .rounded))
+                .font(.system(size: 22, weight: .black).width(.condensed))
                 .foregroundColor(.appAccentOrange)
                 .frame(width: 44, height: 44)
                 .background(Color.appSurface, in: Circle())
                 .overlay(Circle().stroke(Color.appBorder, lineWidth: 1))
 
             Text(text)
-                .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
+                .font(.system(size: 20, weight: .bold).width(.condensed))
+                .foregroundColor(.appTextPrimary)
 
             Spacer()
         }

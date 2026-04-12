@@ -30,7 +30,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>202604101617</string>
+	<string>1</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Used for profile photo</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -57,7 +57,5 @@
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Dark</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 </dict>
 </plist>
