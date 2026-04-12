@@ -303,12 +303,35 @@ button, a {
     grid-column: span 2;
   }
 
-  .steps-row,
-  .mini-highlight-grid {
+  .steps-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .mini-highlight-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-shell {
+    grid-template-columns: minmax(0, 1.3fr) minmax(22rem, 0.7fr);
+    padding: 1.75rem;
+    gap: 1.5rem;
+  }
+
+  .hero-copy {
+    padding: 0.75rem;
+  }
+
+  .steps-row {
+    gap: 1.25rem;
+  }
+
+  .info-card {
+    padding: 1.5rem;
+  }
+
+  .mini-highlight-grid {
+    gap: 1.25rem;
   }
 }
