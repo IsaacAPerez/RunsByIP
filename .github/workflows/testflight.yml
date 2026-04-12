@@ -27,6 +27,9 @@ jobs:
           security set-keychain-settings ~/Library/Keychains/login.keychain-db
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "${{ secrets.KEYCHAIN_PASSWORD }}" ~/Library/Keychains/login.keychain-db
 
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
       - name: Resolve Swift Packages
         run: xcodebuild -resolvePackageDependencies -project RunsByIP.xcodeproj -scheme RunsByIP
 
