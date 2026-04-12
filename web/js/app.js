@@ -44,18 +44,18 @@ let countdownInterval = null;
 const stripeAppearance = {
   theme: 'night',
   variables: {
-    colorPrimary: '#f97316',
-    colorBackground: '#1f2937',
+    colorPrimary: '#FF8C42',
+    colorBackground: '#222228',
     colorText: '#ffffff',
-    colorDanger: '#ef4444',
-    borderRadius: '12px',
+    colorDanger: '#FF3B30',
+    borderRadius: '14px',
     fontFamily: 'Inter, system-ui, sans-serif',
     spacingUnit: '4px',
   },
   rules: {
-    '.Input': { border: '1px solid #374151', backgroundColor: '#1f2937', padding: '12px' },
-    '.Input:focus': { border: '1px solid #f97316', boxShadow: '0 0 0 2px rgba(249, 115, 22, 0.2)' },
-    '.Label': { color: '#9ca3af', marginBottom: '6px' },
+    '.Input': { border: '1px solid #2C2C2E', backgroundColor: '#222228', padding: '12px' },
+    '.Input:focus': { border: '1px solid #FF8C42', boxShadow: '0 0 0 2px rgba(255, 140, 66, 0.2)' },
+    '.Label': { color: '#8E8E93', marginBottom: '6px' },
   },
 };
 
@@ -323,7 +323,7 @@ async function loadSession() {
 
   if (currentSession.status === 'confirmed') {
     sessionStatusBadge.textContent = 'Confirmed';
-    sessionStatusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-blue-500/15 text-blue-400 border border-blue-500/20';
+    sessionStatusBadge.className = 'px-3 py-1 rounded-xl text-xs font-semibold uppercase tracking-wider bg-blue-500/15 text-blue-400 border border-blue-500/20';
   }
 
   showView('session-card');
@@ -402,7 +402,7 @@ function updateRSVPDisplay(rsvps, waitlisted) {
     checkoutLocked.classList.add('hidden');
     sessionFullEl.classList.add('hidden');
     waitlistFormSection.classList.remove('hidden');
-    rsvpProgress.className = 'bg-gradient-to-r from-orange-500 to-orange-400 h-3.5 rounded-full progress-fill';
+    rsvpProgress.className = 'bg-court-orange h-3.5 rounded-full progress-fill';
   } else if (count >= min) {
     rsvpMessage.textContent = `Session confirmed! ${max - count} spot${max - count !== 1 ? 's' : ''} left.`;
     rsvpProgress.className = 'bg-gradient-to-r from-green-500 to-green-400 h-3.5 rounded-full progress-fill';
@@ -411,7 +411,7 @@ function updateRSVPDisplay(rsvps, waitlisted) {
   } else {
     const needed = min - count;
     rsvpMessage.textContent = `${needed} more player${needed !== 1 ? 's' : ''} needed to confirm!`;
-    rsvpProgress.className = 'bg-gradient-to-r from-orange-500 to-orange-400 h-3.5 rounded-full progress-fill';
+    rsvpProgress.className = 'bg-court-orange h-3.5 rounded-full progress-fill';
     waitlistFormSection.classList.add('hidden');
     updatePaymentsState();
   }

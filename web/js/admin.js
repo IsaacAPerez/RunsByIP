@@ -101,33 +101,33 @@ async function loadSessions() {
   }
 
   if (sessions.length === 0) {
-    sessionsList.innerHTML = '<p class="text-gray-500 text-center py-8">No sessions yet. Create one above.</p>';
+    sessionsList.innerHTML = '<p class="text-muted text-center py-8">No sessions yet. Create one above.</p>';
   }
 }
 
 // Build a session card with RSVPs
 function buildSessionCard(session, rsvps) {
   const card = document.createElement('div');
-  card.className = 'bg-gray-900 rounded-xl border border-gray-800 p-6';
+  card.className = 'bg-surface rounded-2xl border border-surface-light p-6';
 
   const paidRsvps = rsvps.filter(r => r.payment_status === 'paid' || r.payment_status === 'cash');
   const pendingRsvps = rsvps.filter(r => r.payment_status === 'pending');
 
   const statusColors = {
-    open: 'bg-green-900 text-green-300',
-    confirmed: 'bg-blue-900 text-blue-300',
-    cancelled: 'bg-red-900 text-red-300',
+    open: 'bg-green-500/15 text-green-400',
+    confirmed: 'bg-blue-500/15 text-blue-400',
+    cancelled: 'bg-red-500/15 text-red-400',
   };
 
   card.innerHTML = `
     <div class="flex items-center justify-between mb-4">
       <div>
         <h3 class="font-semibold text-lg">${formatDate(session.date)}</h3>
-        <p class="text-sm text-gray-400">${escapeHtml(session.time)} · ${escapeHtml(session.location)}</p>
+        <p class="text-sm text-muted">${escapeHtml(session.time)} · ${escapeHtml(session.location)}</p>
       </div>
       <div class="flex items-center gap-2">
         <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusColors[session.status]}">${session.status}</span>
-        <span class="text-sm text-gray-400">${paidRsvps.length}/${session.max_players}</span>
+        <span class="text-sm text-muted">${paidRsvps.length}/${session.max_players}</span>
       </div>
     </div>
 
@@ -143,21 +143,21 @@ function buildSessionCard(session, rsvps) {
           : '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg> DROP IT \u2014 Open Payments'
         }
       </button>
-      <p class="text-xs text-center mt-1.5 ${session.payments_open ? 'text-green-400' : 'text-gray-600'}">
+      <p class="text-xs text-center mt-1.5 ${session.payments_open ? 'text-green-400' : 'text-muted-dark'}">
         ${session.payments_open ? 'Payments are LIVE' : 'Payments locked \u2014 players can see the session but can\u2019t pay yet'}
       </p>
     </div>
     ` : ''}
 
     ${rsvps.length > 0 ? `
-      <div class="border-t border-gray-800 pt-4">
-        <h4 class="text-sm font-medium text-gray-400 mb-2">RSVPs</h4>
+      <div class="border-t border-surface-light pt-4">
+        <h4 class="text-sm font-medium text-muted mb-2">RSVPs</h4>
         <div class="space-y-2">
           ${rsvps.map(rsvp => `
             <div class="flex items-center justify-between text-sm" data-rsvp-id="${rsvp.id}">
               <div>
                 <span class="text-white">${escapeHtml(rsvp.player_name)}</span>
-                <span class="text-gray-500 ml-2">${escapeHtml(rsvp.player_email)}</span>
+                <span class="text-muted ml-2">${escapeHtml(rsvp.player_email)}</span>
               </div>
               <div class="flex items-center gap-2">
                 ${rsvp.payment_status === 'paid' ? `
@@ -165,7 +165,7 @@ function buildSessionCard(session, rsvps) {
                 ` : rsvp.payment_status === 'cash' ? `
                   <span class="text-yellow-400 text-xs font-medium">CASH</span>
                 ` : `
-                  <span class="text-gray-500 text-xs font-medium">PENDING</span>
+                  <span class="text-muted text-xs font-medium">PENDING</span>
                   <button onclick="markCash('${rsvp.id}')"
                     class="text-xs bg-yellow-600 hover:bg-yellow-500 text-white px-2 py-0.5 rounded transition-colors">
                     Mark Cash
@@ -176,13 +176,13 @@ function buildSessionCard(session, rsvps) {
           `).join('')}
         </div>
       </div>
-    ` : '<p class="text-gray-500 text-sm">No RSVPs yet.</p>'}
+    ` : '<p class="text-muted text-sm">No RSVPs yet.</p>'}
 
     ${pendingRsvps.length > 0 ? `
-      <p class="text-xs text-gray-500 mt-3">${pendingRsvps.length} pending payment${pendingRsvps.length !== 1 ? 's' : ''}</p>
+      <p class="text-xs text-muted mt-3">${pendingRsvps.length} pending payment${pendingRsvps.length !== 1 ? 's' : ''}</p>
     ` : ''}
 
-    <div class="border-t border-gray-800 mt-4 pt-4 flex gap-2">
+    <div class="border-t border-surface-light mt-4 pt-4 flex gap-2">
       ${session.status === 'open' ? `
         <button onclick="updateSessionStatus('${session.id}', 'confirmed')"
           class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition-colors">
