@@ -170,3 +170,7 @@ SELECT
   m.created_at
 FROM messages m
 LEFT JOIN profiles p ON p.id = m.user_id;
+
+-- PostgREST: expose view to API roles
+GRANT SELECT ON messages_with_profiles TO authenticated;
+GRANT SELECT ON messages_with_profiles TO service_role;
