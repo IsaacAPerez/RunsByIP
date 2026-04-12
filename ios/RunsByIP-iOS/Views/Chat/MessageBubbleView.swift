@@ -268,7 +268,7 @@ struct RoundedCorner: Shape {
         MessageBubbleView(
             message: ChatMessage(id: "1", userId: "a", displayName: "Isaac", content: "Who's pulling up Saturday?", avatarUrl: nil, messageType: "text", attachmentPath: nil, createdAt: "2026-03-23T10:00:00Z"),
             isCurrentUser: false,
-            reactions: [MessageReaction(messageId: "1", emoji: "🔥", count: 3, userIds: ["x"], displayNames: ["J"])],
+            reactions: [MessageReaction(messageId: "1", emoji: "🔥", count: 3, userIds: ["x"])],
             currentUserId: "x",
             attachmentURL: nil,
             onAvatarTap: {},

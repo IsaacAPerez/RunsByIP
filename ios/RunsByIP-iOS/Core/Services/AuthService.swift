@@ -160,10 +160,11 @@ final class AuthService: ObservableObject {
                 .from("avatars")
                 .getPublicURL(path: path)
 
-            // Save avatar_url to profile
+            let urlString = publicURL.absoluteString
+
             let updated: UserProfile = try await supabase
                 .from("profiles")
-                .update(["avatar_url": publicURL.absoluteString])
+                .update(["avatar_url": urlString])
                 .eq("id", value: userId.uuidString.lowercased())
                 .select()
                 .single()
@@ -171,7 +172,9 @@ final class AuthService: ObservableObject {
                 .value
             currentProfile = updated
 
-            return publicURL.absoluteString
+            try await supabase.auth.update(user: UserAttributes(data: ["avatar_url": AnyJSON.string(urlString)]))
+
+            return urlString
         } catch {
             throw AppError.networkError(error.localizedDescription)
         }

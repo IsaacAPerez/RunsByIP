@@ -28,7 +28,7 @@ final class ChatService: ObservableObject {
     func fetchMessages() async throws {
         do {
             messages = try await supabase
-                .from("messages")
+                .from("messages_with_profiles")
                 .select()
                 .order("created_at", ascending: true)
                 .execute()
@@ -52,7 +52,6 @@ final class ChatService: ObservableObject {
             let userId: String
             let displayName: String
             let content: String
-            let avatarUrl: String?
             let messageType: String
             let attachmentPath: String?
 
@@ -60,14 +59,12 @@ final class ChatService: ObservableObject {
                 case userId = "user_id"
                 case displayName = "display_name"
                 case content
-                case avatarUrl = "avatar_url"
                 case messageType = "message_type"
                 case attachmentPath = "attachment_path"
             }
         }
 
         let displayName = user.userMetadata["display_name"]?.stringValue ?? "Anonymous"
-        let avatarUrl = user.userMetadata["avatar_url"]?.stringValue
 
         do {
             try await supabase
@@ -76,7 +73,6 @@ final class ChatService: ObservableObject {
                     userId: user.id.uuidString.lowercased(),
                     displayName: displayName,
                     content: trimmedContent,
-                    avatarUrl: avatarUrl,
                     messageType: messageType,
                     attachmentPath: attachmentPath
                 ))
@@ -93,7 +89,6 @@ final class ChatService: ObservableObject {
 
     func toggleReaction(messageId: String, emoji: String) async throws {
         let user = try await currentUser()
-        let currentDisplayName = user.userMetadata["display_name"]?.stringValue ?? "Anonymous"
 
         if let existing = reactionRecords.first(where: {
             $0.messageId == messageId && $0.userId == user.id.uuidString && $0.emoji == emoji
@@ -111,13 +106,11 @@ final class ChatService: ObservableObject {
             struct NewReaction: Encodable {
                 let messageId: String
                 let userId: String
-                let displayName: String
                 let emoji: String
 
                 enum CodingKeys: String, CodingKey {
                     case messageId = "message_id"
                     case userId = "user_id"
-                    case displayName = "display_name"
                     case emoji
                 }
             }
@@ -128,7 +121,6 @@ final class ChatService: ObservableObject {
                     .insert(NewReaction(
                         messageId: messageId,
                         userId: user.id.uuidString,
-                        displayName: currentDisplayName,
                         emoji: emoji
                     ))
                     .execute()
@@ -194,6 +186,7 @@ final class ChatService: ObservableObject {
         }
     }
 
+
     func fetchProfile(userId: String) async throws -> UserProfile {
         do {
             return try await supabase
@@ -255,8 +248,7 @@ final class ChatService: ObservableObject {
                         messageId: emojiRows.first?.messageId ?? "",
                         emoji: emoji,
                         count: emojiRows.count,
-                        userIds: Set(emojiRows.map(\.userId)),
-                        displayNames: emojiRows.map(\.displayName)
+                        userIds: Set(emojiRows.map(\.userId))
                     )
                 }
                 .sorted { lhs, rhs in

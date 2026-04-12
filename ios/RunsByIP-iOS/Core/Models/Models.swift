@@ -87,7 +87,6 @@ struct MessageReactionRecord: Codable, Identifiable, Equatable {
     let id: String
     let messageId: String
     let userId: String
-    let displayName: String
     let emoji: String
     let createdAt: String
 
@@ -95,7 +94,6 @@ struct MessageReactionRecord: Codable, Identifiable, Equatable {
         case id, emoji
         case messageId = "message_id"
         case userId = "user_id"
-        case displayName = "display_name"
         case createdAt = "created_at"
     }
 }
@@ -105,7 +103,6 @@ struct MessageReaction: Identifiable, Equatable {
     let emoji: String
     let count: Int
     let userIds: Set<String>
-    let displayNames: [String]
 
     var id: String { "\(messageId)-\(emoji)" }
 }
