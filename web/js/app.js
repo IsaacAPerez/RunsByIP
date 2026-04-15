@@ -280,12 +280,17 @@ payBtn.addEventListener('click', handlePayment);
 async function loadSession() {
   const today = new Date().toISOString().split('T')[0];
 
+  // Web users see sessions tagged for everyone ('all') or the web client
+  // specifically ('web'). iOS-only sessions stay invisible here.
+  const visiblePlatforms = ['all', 'web'];
+
   const { data: activeSessions, error: activeError } = await db
     .from('sessions')
     .select('*')
     .gte('date', today)
     .neq('status', 'cancelled')
     .eq('payments_open', true)
+    .in('platform', visiblePlatforms)
     .order('date', { ascending: true })
     .limit(1);
 
@@ -298,6 +303,7 @@ async function loadSession() {
       .select('*')
       .gte('date', today)
       .neq('status', 'cancelled')
+      .in('platform', visiblePlatforms)
       .order('date', { ascending: true })
       .limit(1);
     sessions = fallback.data;

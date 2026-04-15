@@ -13,6 +13,11 @@ final class SessionService: ObservableObject {
     private var sessionChannel: RealtimeChannelV2?
     private var rsvpChannel: RealtimeChannelV2?
 
+    /// Sessions visible to the iOS app: rows tagged 'all' (default — created
+    /// for every client) or 'ios' (created specifically for this client).
+    /// Web-only ('web') sessions are hidden here.
+    private static let visiblePlatforms = ["all", "ios"]
+
     // MARK: - Sessions
 
     func fetchCurrentSession() async throws {
@@ -27,6 +32,7 @@ final class SessionService: ObservableObject {
                 .select()
                 .neq("status", value: "cancelled")
                 .gte("date", value: String(today))
+                .in("platform", values: Self.visiblePlatforms)
                 .order("date", ascending: true)
                 .limit(1)
                 .execute()
@@ -44,11 +50,22 @@ final class SessionService: ObservableObject {
         }
     }
 
-    func fetchAllSessions() async throws {
+    /// Fetches sessions for display.
+    /// - Parameter forAdmin: When `true`, includes sessions from every platform
+    ///   (web-only, iOS-only, all). Use this from admin views so operators can
+    ///   manage every session regardless of which client it was authored for.
+    ///   Defaults to `false` so end-user views only see the iOS-relevant slice.
+    func fetchAllSessions(forAdmin: Bool = false) async throws {
         do {
-            sessions = try await supabase
+            let query = supabase
                 .from("sessions")
                 .select()
+
+            let filtered = forAdmin
+                ? query
+                : query.in("platform", values: Self.visiblePlatforms)
+
+            sessions = try await filtered
                 .order("date", ascending: false)
                 .execute()
                 .value

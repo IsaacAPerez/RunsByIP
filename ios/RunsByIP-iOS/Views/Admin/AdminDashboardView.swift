@@ -306,7 +306,7 @@ struct AdminDashboardView: View {
 
     private func loadData() async {
         do {
-            try await sessionService.fetchAllSessions()
+            try await sessionService.fetchAllSessions(forAdmin: true)
             try await sessionService.fetchCurrentSession()
             for session in sessionService.sessions {
                 rsvpCounts[session.id] = try await sessionService.fetchPaidRSVPCount(for: session.id)
@@ -333,7 +333,7 @@ struct AdminDashboardView: View {
         Task {
             do {
                 try await sessionService.togglePayments(sessionId: session.id, open: !session.paymentsOpen)
-                try await sessionService.fetchAllSessions()
+                try await sessionService.fetchAllSessions(forAdmin: true)
                 try await sessionService.fetchCurrentSession()
                 showToast("Payments \(session.paymentsOpen ? "closed" : "opened")")
             } catch {
