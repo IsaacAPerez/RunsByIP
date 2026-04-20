@@ -54,49 +54,49 @@ struct HomeView: View {
                         .ignoresSafeArea(edges: .top)
                 }
 
-                if isLoading {
-                    LoadingView(message: "Loading home...")
-                } else {
-                    ScrollView(showsIndicators: false) {
-                        VStack(alignment: .leading, spacing: 20) {
-                            // Header overlay on top of hero
-                            HomeHeader(
-                                firstName: firstName,
-                                hasUpcomingSession: currentSession != nil,
-                                onBrowseRuns: { showAllRuns = true }
-                            )
-                            .padding(.top, 280)
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 20) {
+                        // Header overlay on top of hero
+                        HomeHeader(
+                            firstName: firstName,
+                            hasUpcomingSession: currentSession != nil,
+                            onBrowseRuns: { showAllRuns = true }
+                        )
+                        .padding(.top, 280)
 
-                            if let session = currentSession {
-                                NextRunCard(
-                                    session: session,
-                                    confirmedCount: confirmedCount,
-                                    onRSVP: {
-                                        guard !session.isFull(using: confirmedCount) else { return }
-                                        sessionForRSVP = session
-                                        showRSVP = true
-                                    }
-                                )
-                            } else {
-                                EmptyCountdownCard()
-                            }
-
-                            // Player of the Week
-                            POWCard()
-
-                            // Extra content when no session
-                            if currentSession == nil {
-                                if !leaderboard.isEmpty {
-                                    MostConsistentCard(entries: leaderboard)
+                        if let session = currentSession {
+                            NextRunCard(
+                                session: session,
+                                confirmedCount: confirmedCount,
+                                onRSVP: {
+                                    guard !session.isFull(using: confirmedCount) else { return }
+                                    sessionForRSVP = session
+                                    showRSVP = true
                                 }
-
-                                NBAScoresCard()
-                            }
+                            )
+                        } else if isLoading && !hasLoadedOnce {
+                            HomeStartupCard()
+                        } else {
+                            EmptyCountdownCard()
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 16)
-                        .padding(.bottom, 28)
+
+                        if isLoading && !hasLoadedOnce {
+                            HomeStartupSection(title: "Loading home")
+                        } else {
+                            POWCard()
+                        }
+
+                        if currentSession == nil && !(isLoading && !hasLoadedOnce) {
+                            if !leaderboard.isEmpty {
+                                MostConsistentCard(entries: leaderboard)
+                            }
+
+                            NBAScoresCard()
+                        }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 16)
+                    .padding(.bottom, 28)
                 }
 
                 if let errorMessage {
@@ -195,6 +195,54 @@ private struct HomeHeader: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Browse runs")
+        }
+    }
+}
+
+private struct HomeStartupCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("NEXT RUN")
+                .font(.system(size: 11, weight: .semibold))
+                .tracking(1.6)
+                .foregroundColor(.appTextSecondary)
+
+            Text("Getting the latest run...")
+                .font(.system(size: 28, weight: .black).width(.condensed))
+                .foregroundColor(.white)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text("We’ll drop you straight into home as soon as everything is ready.")
+                .font(.subheadline)
+                .foregroundColor(.appTextSecondary)
+        }
+        .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Color.appBorder, lineWidth: 1)
+        )
+    }
+}
+
+private struct HomeStartupSection: View {
+    let title: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title.uppercased())
+                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                .tracking(1.6)
+                .foregroundColor(.appTextSecondary)
+
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Color.appSurface)
+                .frame(height: 160)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .stroke(Color.appBorder, lineWidth: 1)
+                )
         }
     }
 }
