@@ -20,4 +20,9 @@ else
   fi
 fi
 
+LUKA_LOG="$HOME/Coding/LukaDashboard/Backend/luka-log.py"
+if [ -f "$LUKA_LOG" ]; then
+  /usr/bin/python3 "$LUKA_LOG" "ci" "$TEXT" || true
+fi
+
 curl -s -X POST "${BB_URL}?password=${BB_PASSWORD}" -H "Content-Type: application/json" -d "{\"chatGuid\":\"any;-;${PHONE}\",\"message\":\"${TEXT}\",\"tempGuid\":\"notify-$(date +%s)-$$\"}"
