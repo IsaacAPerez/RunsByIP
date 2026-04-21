@@ -417,9 +417,12 @@ final class ChatService: ObservableObject {
         let typingEvents = channel.broadcastStream(event: "typing")
 
         Task { [weak self] in
-            for await payload in typingEvents {
+            for await event in typingEvents {
                 guard let self else { return }
-                guard let userId = payload["user_id"]?.stringValue,
+                // broadcastStream yields the full broadcast envelope; the
+                // message we sent lives under the "payload" key.
+                guard let payload = event["payload"]?.objectValue,
+                      let userId = payload["user_id"]?.stringValue,
                       let displayName = payload["display_name"]?.stringValue,
                       let state = payload["state"]?.stringValue
                 else { continue }
