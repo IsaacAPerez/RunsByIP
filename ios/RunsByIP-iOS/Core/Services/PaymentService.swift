@@ -14,8 +14,16 @@ final class PaymentService: ObservableObject {
         case cancelled
     }
 
+    /// Gate button visibility on *device capability* (has the secure element),
+    /// not on *card availability*. StripeAPI.deviceSupportsApplePay() uses the
+    /// stricter `canMakePayments(usingNetworks:)` check which returns false on
+    /// devices with no Wallet cards configured — including Apple's review
+    /// devices, which caused a 2.1 rejection ("we were unable to verify any
+    /// integration of Apple Pay"). Using the no-arg canMakePayments() keeps
+    /// the button visible; tapping it on a card-less device shows the system
+    /// "Set Up Apple Pay" flow, which is Apple's expected behavior.
     var isApplePayAvailable: Bool {
-        StripeAPI.deviceSupportsApplePay()
+        PKPaymentAuthorizationController.canMakePayments()
     }
 
     init() {
