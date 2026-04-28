@@ -10,6 +10,8 @@ struct MessageBubbleView: View {
     var avatarDisplayURL: String? = nil
     var onAvatarTap: (() -> Void)?
     var onReact: (String) -> Void
+    /// When `false`, reactions and quick-emoji UI are disabled (chat write gate).
+    var reactionsAllowed: Bool = true
 
     @State private var showImagePreview = false
 
@@ -164,18 +166,17 @@ struct MessageBubbleView: View {
                             : [.topLeft, .topRight, .bottomRight])
                 }
             }
-            .contextMenu {
-                ForEach(quickReactions, id: \.self) { emoji in
-                    Button(emoji) {
-                        onReact(emoji)
-                    }
-                }
-            }
+            .modifier(ReactionContextMenuModifier(
+                reactionsAllowed: reactionsAllowed,
+                quickReactions: quickReactions,
+                onReact: onReact
+            ))
 
             ReactionBar(
                 reactions: reactions,
                 currentUserId: currentUserId,
                 quickReactions: quickReactions,
+                reactionsAllowed: reactionsAllowed,
                 onReact: onReact
             )
         }
@@ -198,10 +199,33 @@ struct MessageBubbleView: View {
     }
 }
 
+private struct ReactionContextMenuModifier: ViewModifier {
+    let reactionsAllowed: Bool
+    let quickReactions: [String]
+    let onReact: (String) -> Void
+
+    func body(content: Content) -> some View {
+        Group {
+            if reactionsAllowed {
+                content.contextMenu {
+                    ForEach(quickReactions, id: \.self) { emoji in
+                        Button(emoji) {
+                            onReact(emoji)
+                        }
+                    }
+                }
+            } else {
+                content
+            }
+        }
+    }
+}
+
 private struct ReactionBar: View {
     let reactions: [MessageReaction]
     let currentUserId: String?
     let quickReactions: [String]
+    let reactionsAllowed: Bool
     let onReact: (String) -> Void
 
     var body: some View {
@@ -230,6 +254,8 @@ private struct ReactionBar: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .disabled(!reactionsAllowed)
+                .opacity(reactionsAllowed ? 1 : 0.45)
             }
 
             Menu {
@@ -245,6 +271,8 @@ private struct ReactionBar: View {
                     .padding(8)
                     .background(Color.white.opacity(0.06), in: Circle())
             }
+            .disabled(!reactionsAllowed)
+            .opacity(reactionsAllowed ? 1 : 0.45)
         }
     }
 }

@@ -50,6 +50,7 @@
 		C7CA3BD09DAAFC736F4BA0D1 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42099E3A4BBB61724D08607A /* NotificationService.swift */; };
 		C8B5EDAC68DDFBABD9B3642D /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636799E22A4668CBFAFA58E /* EmptyStateView.swift */; };
 		C90A3CA7AA0DDFFC10642774 /* MessageBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2288F02C3A84CFF10317947 /* MessageBubbleView.swift */; };
+		CA055442E62B93A2F62A7BE7 /* ChatWriteGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3B1BAFA39E2FB41AB9AEA7 /* ChatWriteGate.swift */; };
 		CA858B8532BA5CEE9DD17F7F /* ChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F540197A7CD9C9C6924402CD /* ChatService.swift */; };
 		DE2A85120DAA8F473C85D3DE /* StripePayments in Frameworks */ = {isa = PBXBuildFile; productRef = FF7BAA83743F0EE2D6BFEC77 /* StripePayments */; };
 		DEBE4A372371A74599C7C1F5 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A074A0EEDC3C00BB266ABBC0 /* ProfileView.swift */; };
@@ -87,6 +88,7 @@
 		8AA9BBCC60CC667796CD7259 /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
 		971EA2DE800BBBAEE983057A /* BadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeView.swift; sourceTree = "<group>"; };
 		9C610DD78757AB371ABEEA52 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		9D3B1BAFA39E2FB41AB9AEA7 /* ChatWriteGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatWriteGate.swift; sourceTree = "<group>"; };
 		A074A0EEDC3C00BB266ABBC0 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		A1F2460D263FA83CFA5FDE02 /* ColorPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPreviewView.swift; sourceTree = "<group>"; };
 		A2288F02C3A84CFF10317947 /* MessageBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleView.swift; sourceTree = "<group>"; };
@@ -245,6 +247,7 @@
 			children = (
 				7A21B7B63E4F81170C5B2BF1 /* AuthService.swift */,
 				F540197A7CD9C9C6924402CD /* ChatService.swift */,
+				9D3B1BAFA39E2FB41AB9AEA7 /* ChatWriteGate.swift */,
 				42099E3A4BBB61724D08607A /* NotificationService.swift */,
 				B3125BABB939048E525C4B23 /* PaymentService.swift */,
 				184BE1D7A646185980C24A37 /* POWService.swift */,
@@ -350,6 +353,7 @@
 				};
 			};
 			buildConfigurationList = 72C395E0234C6279E1F0F8D7 /* Build configuration list for PBXProject "RunsByIP" */;
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -363,7 +367,6 @@
 				91C8443658174D5859C1556C /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 5E0171DDCB89DD586DD5B4DE /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -399,6 +402,7 @@
 				3544D7295365EC6E7912BF36 /* BadgeView.swift in Sources */,
 				CA858B8532BA5CEE9DD17F7F /* ChatService.swift in Sources */,
 				9334B0CEE14B7216B13CF512 /* ChatView.swift in Sources */,
+				CA055442E62B93A2F62A7BE7 /* ChatWriteGate.swift in Sources */,
 				7A9C2EFE83D9508A9C70F2B8 /* Color+App.swift in Sources */,
 				2DB2D7C66A6685ED3E706CF0 /* Color+Hex.swift in Sources */,
 				4967595ACAE0EC96F97B4BE9 /* ColorPreviewView.swift in Sources */,

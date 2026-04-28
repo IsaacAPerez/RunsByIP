@@ -4,6 +4,7 @@ import PhotosUI
 struct ChatView: View {
     @EnvironmentObject var chatService: ChatService
     @EnvironmentObject var authService: AuthService
+    @StateObject private var chatWriteGate = ChatWriteGate()
 
     @State private var messageText = ""
     @State private var isLoading = true
@@ -16,6 +17,13 @@ struct ChatView: View {
     @State private var typingResetTask: Task<Void, Never>?
     @State private var showMembers = false
     @State private var isMuted = false
+
+    @State private var gatePassphrase = ""
+    @State private var gateError: String?
+
+    private var canUseChatWrites: Bool {
+        !ChatWriteGateConfig.isEnabled || chatWriteGate.isUnlocked
+    }
 
     private var typingIndicatorText: String? {
         let names = chatService.typingUsers.map(\.displayName)
@@ -68,7 +76,8 @@ struct ChatView: View {
                                             },
                                             onReact: { emoji in
                                                 react(to: message.id, emoji: emoji)
-                                            }
+                                            },
+                                            reactionsAllowed: canUseChatWrites
                                         )
                                         .id(message.id)
                                     }
@@ -96,7 +105,7 @@ struct ChatView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
-                        } else {
+                        } else if canUseChatWrites {
                             if let typingIndicatorText {
                                 HStack(spacing: 8) {
                                     TypingDotsView()
@@ -180,6 +189,16 @@ struct ChatView: View {
                             }
                             .padding(.horizontal)
                             .padding(.vertical, 10)
+                        } else {
+                            ChatWriteGatePanel(
+                                chatWriteGate: chatWriteGate,
+                                passphrase: $gatePassphrase,
+                                errorMessage: $gateError,
+                                onUnlocked: {
+                                    gatePassphrase = ""
+                                    gateError = nil
+                                }
+                            )
                         }
                     }
                     .background(Color.appBackground)
@@ -188,11 +207,25 @@ struct ChatView: View {
             .condensedNavTitle("Chat")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showMembers = true
-                    } label: {
-                        Image(systemName: "person.2.fill")
-                            .foregroundColor(.appAccentOrange)
+                    HStack(spacing: 16) {
+                        if ChatWriteGateConfig.isEnabled, chatWriteGate.isUnlocked {
+                            Button {
+                                typingResetTask?.cancel()
+                                chatService.setTyping(isTyping: false)
+                                chatWriteGate.lock()
+                                gateError = nil
+                            } label: {
+                                Image(systemName: "lock.open.fill")
+                                    .foregroundColor(.appAccentOrange)
+                            }
+                            .accessibilityLabel("Lock chat sending")
+                        }
+                        Button {
+                            showMembers = true
+                        } label: {
+                            Image(systemName: "person.2.fill")
+                                .foregroundColor(.appAccentOrange)
+                        }
                     }
                 }
             }
@@ -200,6 +233,14 @@ struct ChatView: View {
                 MembersListView()
                     .environmentObject(chatService)
                     .environmentObject(authService)
+            }
+            .onChange(of: chatWriteGate.isUnlocked) { _, unlocked in
+                if !unlocked {
+                    typingResetTask?.cancel()
+                    chatService.setTyping(isTyping: false)
+                    clearSelectedPhoto()
+                    messageText = ""
+                }
             }
             .task {
                 await loadChat()
@@ -291,6 +332,7 @@ struct ChatView: View {
     }
 
     private func sendMessage() {
+        guard canUseChatWrites else { return }
         let content = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
         let photoData = selectedPhotoData
         guard !content.isEmpty || photoData != nil else { return }
@@ -319,6 +361,10 @@ struct ChatView: View {
     }
 
     private func react(to messageId: String, emoji: String) {
+        guard canUseChatWrites else {
+            errorMessage = "Unlock chat below to react."
+            return
+        }
         Task {
             do {
                 try await chatService.toggleReaction(messageId: messageId, emoji: emoji)
@@ -329,6 +375,7 @@ struct ChatView: View {
     }
 
     private func handleComposerChange(_ newValue: String) {
+        guard canUseChatWrites else { return }
         guard currentUserId != nil else { return }
         let hasContent = !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || selectedPhotoData != nil
         chatService.setTyping(isTyping: hasContent)
@@ -341,6 +388,106 @@ struct ChatView: View {
             guard !Task.isCancelled else { return }
             await MainActor.run {
                 chatService.setTyping(isTyping: false)
+            }
+        }
+    }
+}
+
+private struct ChatWriteGatePanel: View {
+    @ObservedObject var chatWriteGate: ChatWriteGate
+    @Binding var passphrase: String
+    @Binding var errorMessage: String?
+    var onUnlocked: () -> Void
+
+    @FocusState private var fieldFocused: Bool
+    @State private var isVerifying = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Chat is protected")
+                .font(.subheadline.bold())
+                .foregroundColor(.white)
+
+            Text("Enter the group passphrase to send messages, show typing, and add reactions.")
+                .font(.caption)
+                .foregroundColor(.appTextSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if chatWriteGate.isInLockout {
+                Text("Too many attempts. Try again in \(chatWriteGate.lockoutRemainingSeconds)s.")
+                    .font(.caption)
+                    .foregroundColor(.appError)
+            } else if let err = chatWriteGate.lastVerificationError {
+                Text(err)
+                    .font(.caption)
+                    .foregroundColor(.appError)
+            } else if let errorMessage {
+                Text(errorMessage)
+                    .font(.caption)
+                    .foregroundColor(.appError)
+            }
+
+            SecureField("Passphrase", text: $passphrase)
+                .textContentType(.password)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .foregroundColor(.white)
+                .padding(12)
+                .background(Color.appSurfaceElevated)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.appBorder, lineWidth: 1)
+                )
+                .focused($fieldFocused)
+                .disabled(isVerifying)
+
+            Button {
+                tryUnlock()
+            } label: {
+                Group {
+                    if isVerifying {
+                        ProgressView()
+                            .tint(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                    } else {
+                        Text("Unlock chat")
+                            .font(.system(size: 15, weight: .bold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                    }
+                }
+                .background(Color.appAccentOrange)
+                .foregroundColor(.black)
+                .clipShape(RoundedRectangle(cornerRadius: AppStyle.buttonCornerRadius, style: .continuous))
+            }
+            .disabled(
+                passphrase.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    || chatWriteGate.isInLockout
+                    || isVerifying
+            )
+            .opacity(chatWriteGate.isInLockout ? 0.5 : 1)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 10)
+        .background(Color.appBackground)
+        .onAppear { fieldFocused = true }
+    }
+
+    private func tryUnlock() {
+        errorMessage = nil
+        isVerifying = true
+        Task { @MainActor in
+            let ok = await chatWriteGate.submitPassphrase(passphrase)
+            isVerifying = false
+            if ok {
+                onUnlocked()
+            } else if chatWriteGate.lastVerificationError != nil {
+                passphrase = ""
+            } else if !chatWriteGate.isInLockout {
+                errorMessage = "Incorrect passphrase"
+                passphrase = ""
             }
         }
     }

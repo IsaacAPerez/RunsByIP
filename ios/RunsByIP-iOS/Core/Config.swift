@@ -18,3 +18,14 @@ struct StripeConfig {
 struct AppConfig {
     static let environment: AppEnvironment = .dev
 }
+
+// MARK: - Chat write gate (send, typing indicator, reactions)
+
+struct ChatWriteGateConfig {
+    /// Passphrase is stored as a bcrypt hash in Supabase (`chat_write_gate` + `verify_chat_write_gate` RPC).
+    /// Apply migration `009_chat_write_gate.sql`, then rotate with:
+    /// `UPDATE chat_write_gate SET password_hash = extensions.crypt('secret', extensions.gen_salt('bf')) WHERE id = 1;`
+
+    /// Set to `false` to allow all signed-in users to use chat without a passphrase.
+    static let isEnabled = true
+}
