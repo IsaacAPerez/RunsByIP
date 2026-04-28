@@ -4,27 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>You're In! — RunsByIP</title>
-  <meta name="theme-color" content="#0A0A0A">
+  <meta name="theme-color" content="#000000">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            display: ['Space Grotesk', 'sans-serif'],
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+            display: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
           },
           colors: {
-            court: { orange: '#FF8C42' },
-            bg: '#0A0A0A',
-            muted: '#8E8E93',
+            brand: '#FFFFFF',
+            bg: '#000000',
+            muted: '#666666',
           },
         }
       }
     }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="bg-bg text-white min-h-screen flex items-center justify-center font-sans px-5" style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);">
@@ -33,7 +31,7 @@
     <img src="icons/icon-192.png" alt="RunsByIP" class="w-20 h-20 rounded-2xl mx-auto mb-6" id="ball-icon">
     <h1 class="text-3xl font-extrabold mb-2">You're In!</h1>
     <p class="text-muted text-base mb-8">Payment confirmed. See you on the court.</p>
-    <a href="index.html" class="inline-block w-full bg-court-orange active:brightness-90 text-white font-bold px-6 py-4 rounded-xl transition-all shadow-lg shadow-court-orange/20 text-lg">
+    <a href="index.html" class="inline-block w-full bg-brand active:bg-white/90 text-black font-bold px-6 py-4 rounded-xl transition-all shadow-lg shadow-white/10 text-lg">
       Back to Session
     </a>
   </div>
@@ -44,7 +42,7 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const colors = ['#FF8C42', '#FF9500', '#F5F0E8', '#34C759', '#3b82f6', '#FFD700', '#ffffff'];
+    const colors = ['#FFFFFF', '#FF9500', '#F5F0E8', '#34C759', '#3b82f6', '#FFD700', '#666666'];
     const pieces = [];
 
     for (let i = 0; i < 120; i++) {

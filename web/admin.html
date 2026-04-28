@@ -4,29 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Admin — RunsByIP</title>
-  <meta name="theme-color" content="#0A0A0A">
+  <meta name="theme-color" content="#000000">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            display: ['Space Grotesk', 'sans-serif'],
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+            display: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
           },
           colors: {
-            court: { orange: '#FF8C42' },
-            surface: { DEFAULT: '#1A1A1E', light: '#222228', lighter: '#2C2C2E' },
-            bg: '#0A0A0A',
-            muted: '#8E8E93',
-            'muted-dark': '#48484A',
+            brand: '#FFFFFF',
+            surface: { DEFAULT: '#0F0F0F', light: '#161616', lighter: '#1A1A1A' },
+            bg: '#000000',
+            muted: '#666666',
+            'muted-dark': '#333333',
+            success: '#34C759',
+            danger: '#FF3B30',
+            warning: '#FF9500',
           },
         }
       }
     }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
@@ -53,16 +54,16 @@
           <div>
             <label for="login-email" class="block text-base text-muted mb-2">Email</label>
             <input type="email" id="login-email" required autocomplete="email"
-              class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white placeholder-muted-dark focus:outline-none focus:ring-2 focus:ring-court-orange focus:border-transparent">
+              class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white placeholder-muted-dark focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent">
           </div>
           <div>
             <label for="login-password" class="block text-base text-muted mb-2">Password</label>
             <input type="password" id="login-password" required autocomplete="current-password"
-              class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white placeholder-muted-dark focus:outline-none focus:ring-2 focus:ring-court-orange focus:border-transparent">
+              class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white placeholder-muted-dark focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent">
           </div>
           <p id="login-error" class="text-red-400 text-sm hidden"></p>
           <button type="submit" id="login-btn"
-            class="w-full bg-court-orange active:brightness-90 text-white font-bold py-3.5 rounded-xl transition-all text-base">
+            class="w-full bg-brand active:bg-white/90 text-black font-bold py-3.5 rounded-xl transition-all text-base">
             Log In
           </button>
         </form>
@@ -80,37 +81,47 @@
             <div>
               <label for="session-date" class="block text-base text-muted mb-2">Date</label>
               <input type="date" id="new-session-date" required
-                class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white focus:outline-none focus:ring-2 focus:ring-court-orange focus:border-transparent">
+                class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent">
             </div>
             <div>
               <label for="session-time" class="block text-base text-muted mb-2">Time</label>
               <input type="text" id="new-session-time" value="7:00 PM" required
-                class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white focus:outline-none focus:ring-2 focus:ring-court-orange focus:border-transparent">
+                class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent">
             </div>
           </div>
           <div>
             <label for="session-location" class="block text-base text-muted mb-2">Location</label>
             <input type="text" id="new-session-location" required placeholder="Gym name & address"
-              class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white placeholder-muted-dark focus:outline-none focus:ring-2 focus:ring-court-orange focus:border-transparent">
+              class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white placeholder-muted-dark focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent">
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label for="session-max-players" class="block text-base text-muted mb-2">Max Players</label>
               <input type="number" id="new-session-max-players" value="15" required min="2" max="30"
-                class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white focus:outline-none focus:ring-2 focus:ring-court-orange focus:border-transparent">
+                class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent">
             </div>
             <div>
               <label for="session-price" class="block text-base text-muted mb-2">Price ($)</label>
               <input type="number" id="new-session-price" value="10" required min="1" max="100"
-                class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white focus:outline-none focus:ring-2 focus:ring-court-orange focus:border-transparent">
+                class="w-full bg-surface-light border border-surface-lighter rounded-xl px-4 py-3.5 text-base text-white focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent">
             </div>
           </div>
           <button type="submit" id="create-session-btn"
-            class="w-full sm:w-auto bg-court-orange active:brightness-90 text-white font-bold px-6 py-3.5 rounded-xl transition-all text-base">
+            class="w-full sm:w-auto bg-brand active:bg-white/90 text-black font-bold px-6 py-3.5 rounded-xl transition-all text-base">
             Create Session
           </button>
         </form>
       </div>
+
+      <details class="bg-surface rounded-2xl border border-surface-light p-4 sm:p-5 mb-5 text-sm text-muted open:mb-5">
+        <summary class="cursor-pointer font-semibold text-white select-none">Session statuses (what each means)</summary>
+        <ul class="mt-3 space-y-2 list-disc pl-5 text-muted leading-relaxed">
+          <li><strong class="text-white">Open</strong> — Run is on the calendar. The site shows a green &ldquo;Open&rdquo; badge. Who can pay is controlled only by <strong class="text-white">Drop it / Lock payments</strong> below.</li>
+          <li><strong class="text-white">Completed</strong> — Set automatically after the run&rsquo;s calendar date in Los Angeles (payments turn off). Past runs stay visible in admin; you can reopen as Open if needed.</li>
+          <li><strong class="text-white">Cancel run</strong> — Run is off. It disappears from the public signup flow (same as iOS &ldquo;Cancelled&rdquo;).</li>
+          <li><strong class="text-white">Delete event</strong> — Permanently removes the row and its RSVPs (good for test sessions). Card payments are <strong class="text-white">not</strong> auto-refunded; use Stripe if someone paid.</li>
+        </ul>
+      </details>
 
       <!-- Sessions List -->
       <div id="sessions-list" class="space-y-4"></div>

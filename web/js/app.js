@@ -39,18 +39,18 @@ let countdownInterval = null;
 const stripeAppearance = {
   theme: 'night',
   variables: {
-    colorPrimary: '#FF8C42',
-    colorBackground: '#222228',
+    colorPrimary: '#FFFFFF',
+    colorBackground: '#161616',
     colorText: '#ffffff',
     colorDanger: '#FF3B30',
     borderRadius: '14px',
-    fontFamily: 'Inter, system-ui, sans-serif',
+    fontFamily: '-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, Roboto, sans-serif',
     spacingUnit: '4px',
   },
   rules: {
-    '.Input': { border: '1px solid #2C2C2E', backgroundColor: '#222228', padding: '12px' },
-    '.Input:focus': { border: '1px solid #FF8C42', boxShadow: '0 0 0 2px rgba(255, 140, 66, 0.2)' },
-    '.Label': { color: '#8E8E93', marginBottom: '6px' },
+    '.Input': { border: '1px solid #1A1A1A', backgroundColor: '#161616', padding: '12px' },
+    '.Input:focus': { border: '1px solid #FFFFFF', boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.15)' },
+    '.Label': { color: '#666666', marginBottom: '6px' },
   },
 };
 
@@ -278,6 +278,8 @@ payBtn.addEventListener('click', handlePayment);
 
 // Load the next upcoming session
 async function loadSession() {
+  await db.rpc('mark_past_sessions_completed');
+
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
@@ -289,7 +291,7 @@ async function loadSession() {
     .from('sessions')
     .select('*')
     .gte('date', today)
-    .neq('status', 'cancelled')
+    .eq('status', 'open')
     .eq('payments_open', true)
     .in('platform', visiblePlatforms)
     .order('date', { ascending: true })
@@ -303,7 +305,7 @@ async function loadSession() {
       .from('sessions')
       .select('*')
       .gte('date', today)
-      .neq('status', 'cancelled')
+      .eq('status', 'open')
       .in('platform', visiblePlatforms)
       .order('date', { ascending: true })
       .limit(1);
@@ -323,10 +325,9 @@ async function loadSession() {
   sessionLocation.textContent = currentSession.location;
   sessionPrice.textContent = `$${(currentSession.price_cents / 100).toFixed(0)}`;
 
-  if (currentSession.status === 'confirmed') {
-    sessionStatusBadge.textContent = 'Confirmed';
-    sessionStatusBadge.className = 'px-3 py-1 rounded-xl text-xs font-semibold uppercase tracking-wider bg-blue-500/15 text-blue-400 border border-blue-500/20';
-  }
+  sessionStatusBadge.textContent = 'Open';
+  sessionStatusBadge.className =
+    'px-3 py-1 rounded-xl text-xs font-semibold uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20';
 
   showView('session-card');
   updatePaymentsState();
@@ -398,7 +399,7 @@ function updateRSVPDisplay(rsvps) {
     checkoutSection.classList.add('hidden');
     checkoutLocked.classList.add('hidden');
     sessionFullEl.classList.remove('hidden');
-    rsvpProgress.className = 'bg-court-orange h-3.5 rounded-full progress-fill';
+    rsvpProgress.className = 'bg-brand h-3.5 rounded-full progress-fill';
   } else if (count >= min) {
     rsvpMessage.textContent = `Session confirmed! ${max - count} spot${max - count !== 1 ? 's' : ''} left.`;
     rsvpProgress.className = 'bg-gradient-to-r from-green-500 to-green-400 h-3.5 rounded-full progress-fill';
@@ -406,7 +407,7 @@ function updateRSVPDisplay(rsvps) {
   } else {
     const needed = min - count;
     rsvpMessage.textContent = `${needed} more player${needed !== 1 ? 's' : ''} needed to confirm!`;
-    rsvpProgress.className = 'bg-court-orange h-3.5 rounded-full progress-fill';
+    rsvpProgress.className = 'bg-brand h-3.5 rounded-full progress-fill';
     updatePaymentsState();
   }
 
@@ -505,8 +506,84 @@ document.getElementById('install-btn').addEventListener('click', async () => {
   deferredPrompt = null;
 });
 
+// ---- Hero gallery (same bucket + motion as iOS HeroGalleryView) ----
+let heroGalleryRaf = null;
+
+function initHeroGallery() {
+  const root = document.getElementById('hero-gallery-root');
+  const strip = document.getElementById('hero-gallery-strip');
+  const inner = document.getElementById('hero-section-inner');
+  if (!db || !root || !strip || !inner) return;
+
+  db.storage
+    .from('gallery')
+    .list()
+    .then(({ data: files, error }) => {
+      if (error || !files?.length) return;
+      const urls = files
+        .filter((f) => f.name && !f.name.startsWith('.'))
+        .map((f) => db.storage.from('gallery').getPublicUrl(f.name).data.publicUrl)
+        .filter(Boolean);
+      if (urls.length === 0) return;
+
+      const speed = 30;
+      const appendImages = (parent) => {
+        urls.forEach((url) => {
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = '';
+          img.loading = 'lazy';
+          parent.appendChild(img);
+        });
+      };
+      appendImages(strip);
+      appendImages(strip);
+
+      root.classList.remove('hidden');
+      inner.classList.add('hero-with-gallery');
+
+      const viewport = root.querySelector('.hero-gallery-viewport');
+      let x = 0;
+      let last = performance.now();
+      let singleStripWidth = 0;
+
+      function layout() {
+        const w = viewport?.clientWidth || window.innerWidth;
+        const imageWidth = Math.max(w * 0.75, 250);
+        singleStripWidth = urls.length * imageWidth;
+        strip.querySelectorAll('img').forEach((img) => {
+          img.style.width = `${imageWidth}px`;
+        });
+      }
+
+      layout();
+      let resizeT;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeT);
+        resizeT = setTimeout(layout, 100);
+      });
+
+      function tick(now) {
+        if (singleStripWidth <= 0) {
+          heroGalleryRaf = requestAnimationFrame(tick);
+          return;
+        }
+        const dt = (now - last) / 1000;
+        last = now;
+        x -= speed * dt;
+        if (x <= -singleStripWidth) x += singleStripWidth;
+        strip.style.transform = `translateX(${x}px)`;
+        heroGalleryRaf = requestAnimationFrame(tick);
+      }
+
+      heroGalleryRaf = requestAnimationFrame(tick);
+    })
+    .catch(() => {});
+}
+
 // Initialize (skip in Instagram's browser — inline fallback handles it)
 if (db) {
+  initHeroGallery();
   loadSession().catch(err => {
     console.error('Failed to load session:', err);
     showView('no-session');
