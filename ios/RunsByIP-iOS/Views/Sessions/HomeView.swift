@@ -274,7 +274,7 @@ private struct NextRunCard: View {
 
                 Spacer()
 
-                BadgeView.forStatus(session.status)
+                BadgeView.forStatus(session.effectiveStatus)
             }
 
             // Countdown — isolated via TimelineView, won't invalidate parent
@@ -334,8 +334,8 @@ private struct NextRunCard: View {
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
             .buttonStyle(.plain)
-            .disabled(spotsLeft == 0)
-            .opacity(spotsLeft == 0 ? 0.55 : 1)
+            .disabled(spotsLeft == 0 || session.isCompleted)
+            .opacity((spotsLeft == 0 || session.isCompleted) ? 0.55 : 1)
         }
         .padding(22)
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 24, style: .continuous))

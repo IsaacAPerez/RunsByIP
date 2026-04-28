@@ -20,11 +20,13 @@ struct SessionCardView: View {
 
     private var isFull: Bool { rsvpCount >= session.maxPlayers }
     private var isCancelled: Bool { session.isCancelled }
+    private var isCompleted: Bool { session.isCompleted }
 
     private var displayStatus: String {
         if isCancelled { return "cancelled" }
+        if isCompleted { return "completed" }
         if isFull { return "full" }
-        return session.status
+        return session.effectiveStatus
     }
 
     var body: some View {
@@ -113,6 +115,12 @@ struct SessionCardView: View {
                 // Action Button
                 if isCancelled {
                     // No button for cancelled sessions
+                } else if isCompleted {
+                    Text("This run has ended.")
+                        .font(.caption)
+                        .foregroundColor(.appTextSecondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 8)
                 } else if isFull {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("ALL SPOTS TAKEN")

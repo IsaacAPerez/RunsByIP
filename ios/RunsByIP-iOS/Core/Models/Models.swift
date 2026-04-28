@@ -10,7 +10,7 @@ struct GameSession: Codable, Identifiable {
     let priceCents: Int
     let minPlayers: Int
     let maxPlayers: Int
-    let status: String // "open", "confirmed", or "cancelled"
+    let status: String // "open", "completed", or "cancelled"
     let paymentsOpen: Bool
     let createdAt: String
 
@@ -206,8 +206,12 @@ struct DeviceToken: Codable, Identifiable {
 // MARK: - GameSession Helpers
 
 extension GameSession {
-    var isCancelled: Bool { status == "cancelled" }
-    var isOpen: Bool { status == "open" }
+    /// Legacy rows may still have `status == "confirmed"` until the DB migration runs; treat as open.
+    var effectiveStatus: String { status == "confirmed" ? "open" : status }
+
+    var isCancelled: Bool { effectiveStatus == "cancelled" }
+    var isCompleted: Bool { effectiveStatus == "completed" }
+    var isOpen: Bool { effectiveStatus == "open" }
 
     func isFull(using confirmedCount: Int) -> Bool {
         confirmedCount >= maxPlayers

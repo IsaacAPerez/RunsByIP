@@ -347,6 +347,8 @@ struct AdminDashboardView: View {
         isCreatingPoll = true
         Task {
             do {
+                try await supabase.rpc("mark_past_sessions_completed").execute()
+
                 // Find the most recent completed session (past date)
                 let formatter = DateFormatter()
                 formatter.dateFormat = "yyyy-MM-dd"
@@ -551,7 +553,7 @@ struct AdminSessionRow: View {
 
                 Spacer()
 
-                BadgeView.forStatus(session.status)
+                BadgeView.forStatus(session.effectiveStatus)
 
                 Image(systemName: "chevron.right")
                     .font(.caption)
@@ -563,31 +565,23 @@ struct AdminSessionRow: View {
                     // Status controls
                     AdminRowPill(
                         label: "Open",
-                        isActive: session.status == "open",
+                        isActive: session.effectiveStatus == "open",
                         activeColor: .appSuccess
                     ) {
-                        if session.status != "open" { onStatusChange?("open") }
-                    }
-
-                    AdminRowPill(
-                        label: "Confirmed",
-                        isActive: session.status == "confirmed",
-                        activeColor: .appAccentOrange
-                    ) {
-                        if session.status != "confirmed" { onStatusChange?("confirmed") }
+                        if session.effectiveStatus != "open" { onStatusChange?("open") }
                     }
 
                     AdminRowPill(
                         label: "Cancelled",
-                        isActive: session.status == "cancelled",
+                        isActive: session.effectiveStatus == "cancelled",
                         activeColor: .appError
                     ) {
-                        if session.status != "cancelled" { onStatusChange?("cancelled") }
+                        if session.effectiveStatus != "cancelled" { onStatusChange?("cancelled") }
                     }
 
                     Spacer()
 
-                    // Payments toggle
+                    // Payments toggle (only for upcoming / open runs)
                     Button {
                         onTogglePayments?()
                     } label: {
@@ -605,6 +599,8 @@ struct AdminSessionRow: View {
                         .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)
+                    .disabled(session.effectiveStatus != "open")
+                    .opacity(session.effectiveStatus == "open" ? 1 : 0.45)
                 }
             }
         }

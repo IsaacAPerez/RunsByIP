@@ -47,6 +47,10 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Session is cancelled" }, 400);
     }
 
+    if (session.status === "completed") {
+      return json({ error: "Session has ended" }, 400);
+    }
+
     if (!session.payments_open) {
       return json({ error: "Payments are not open yet" }, 400);
     }

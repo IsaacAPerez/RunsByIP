@@ -80,7 +80,7 @@ struct SessionRowView: View {
 
             Spacer()
 
-            BadgeView.forStatus(session.status)
+            BadgeView.forStatus(session.effectiveStatus)
         }
         .padding(.vertical, 4)
     }

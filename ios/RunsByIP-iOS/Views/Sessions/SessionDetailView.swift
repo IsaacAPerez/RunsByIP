@@ -14,6 +14,13 @@ struct SessionDetailView: View {
     private var confirmed: [RSVP] { rsvps }
     private var isFull: Bool { confirmed.count >= session.maxPlayers }
 
+    private var headerBadgeStatus: String {
+        if session.isCancelled { return "cancelled" }
+        if session.isCompleted { return "completed" }
+        if isFull { return "full" }
+        return session.effectiveStatus
+    }
+
     var body: some View {
         ZStack {
             Color.appBackground.ignoresSafeArea()
@@ -30,7 +37,7 @@ struct SessionDetailView: View {
                                     .font(.title2.bold())
                                     .foregroundColor(.white)
                                 Spacer()
-                                BadgeView.forStatus(isFull ? "full" : session.status)
+                                BadgeView.forStatus(headerBadgeStatus)
                             }
 
                             HStack(spacing: 16) {
@@ -77,7 +84,24 @@ struct SessionDetailView: View {
                                 .stroke(Color.appBorder, lineWidth: 1)
                         )
 
-                        if isFull {
+                        if session.isCompleted {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Run completed")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+
+                                Text("This session is in the past and no longer accepts RSVPs.")
+                                    .font(.subheadline)
+                                    .foregroundColor(.appTextSecondary)
+                            }
+                            .padding()
+                            .background(Color.appSurface)
+                            .cornerRadius(AppStyle.cardCornerRadius)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: AppStyle.cardCornerRadius)
+                                    .stroke(Color.appBorder, lineWidth: 1)
+                            )
+                        } else if isFull {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("All spots taken")
                                     .font(.headline)
@@ -97,7 +121,7 @@ struct SessionDetailView: View {
                         }
 
                         // RSVP Button
-                        if !session.isCancelled && !isFull {
+                        if !session.isCancelled && !session.isCompleted && !isFull {
                             Button {
                                 showRSVP = true
                             } label: {

@@ -38,7 +38,7 @@ struct AdminRSVPView: View {
                                     .foregroundColor(.appTextSecondary)
                             }
                             Spacer()
-                            BadgeView.forStatus(session.status)
+                            BadgeView.forStatus(session.effectiveStatus)
                         }
 
                         // Actions

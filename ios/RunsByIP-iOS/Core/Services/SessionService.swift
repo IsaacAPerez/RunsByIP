@@ -20,8 +20,15 @@ final class SessionService: ObservableObject {
 
     // MARK: - Sessions
 
+    /// Aligns `open` sessions whose run date is before today (Los Angeles) to `completed` and locks payments.
+    private func markPastSessionsCompleted() async throws {
+        try await supabase.rpc("mark_past_sessions_completed").execute()
+    }
+
     func fetchCurrentSession() async throws {
         do {
+            try await markPastSessionsCompleted()
+
             // Use local timezone for date comparison (not UTC) so evening sessions aren't skipped
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd"
@@ -30,7 +37,7 @@ final class SessionService: ObservableObject {
             let results: [GameSession] = try await supabase
                 .from("sessions")
                 .select()
-                .neq("status", value: "cancelled")
+                .eq("status", value: "open")
                 .gte("date", value: String(today))
                 .in("platform", values: Self.visiblePlatforms)
                 .order("date", ascending: true)
@@ -57,6 +64,8 @@ final class SessionService: ObservableObject {
     ///   Defaults to `false` so end-user views only see the iOS-relevant slice.
     func fetchAllSessions(forAdmin: Bool = false) async throws {
         do {
+            try await markPastSessionsCompleted()
+
             let query = supabase
                 .from("sessions")
                 .select()

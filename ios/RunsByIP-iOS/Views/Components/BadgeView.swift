@@ -13,8 +13,8 @@ struct BadgeView: View {
         switch status.lowercased() {
         case "open":
             return BadgeView("Open", color: .appSuccess)
-        case "confirmed":
-            return BadgeView("Confirmed", color: .appAccentOrange)
+        case "completed":
+            return BadgeView("Completed", color: .appTextSecondary)
         case "cancelled":
             return BadgeView("Cancelled", color: .appError)
         case "full":
@@ -44,6 +44,7 @@ struct BadgeView: View {
 #Preview {
     HStack {
         BadgeView.forStatus("open")
+        BadgeView.forStatus("completed")
         BadgeView.forStatus("cancelled")
         BadgeView.forStatus("paid")
     }
