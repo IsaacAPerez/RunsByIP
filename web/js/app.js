@@ -34,6 +34,7 @@ const emailInput = document.getElementById('player-email');
 let currentSession = null;
 let elements = null;
 let countdownInterval = null;
+let rsvpCountInterval = null;
 
 // Stripe appearance config
 const stripeAppearance = {
@@ -364,28 +365,25 @@ function subscribeToSession() {
     .subscribe();
 }
 
-// Load RSVPs
+// Load RSVP count through the public-safe RPC. Public RLS intentionally hides
+// rsvps rows so player names/emails stay private on the signup page.
 async function loadRSVPs() {
   if (!currentSession) return;
 
-  // Every row in rsvps is a confirmed (paid) attendee — the stripe-webhook
-  // is the only thing that inserts rows, and only on payment_intent.succeeded.
-  const { data: rsvps, error } = await db
-    .from('rsvps')
-    .select('*')
-    .eq('session_id', currentSession.id);
+  const { data: count, error } = await db.rpc('session_rsvp_count', {
+    p_session_id: currentSession.id,
+  });
 
   if (error) {
-    console.error('Error loading RSVPs:', error);
+    console.error('Error loading RSVP count:', error);
     return;
   }
 
-  updateRSVPDisplay(rsvps || []);
+  updateRSVPDisplay(Number(count) || 0);
 }
 
 // Update RSVP display
-function updateRSVPDisplay(rsvps) {
-  const count = rsvps.length;
+function updateRSVPDisplay(count) {
   const max = currentSession.max_players;
   const min = currentSession.min_players;
   const pct = Math.min((count / max) * 100, 100);
@@ -411,37 +409,23 @@ function updateRSVPDisplay(rsvps) {
     updatePaymentsState();
   }
 
-  currentRSVPs = rsvps;
   const teamRandomizer = document.getElementById('team-randomizer');
-  if (count >= 4) {
-    teamRandomizer.classList.remove('hidden');
-  } else {
-    teamRandomizer.classList.add('hidden');
-  }
+  teamRandomizer.classList.add('hidden');
 
   playerList.innerHTML = '';
-  rsvps.forEach((rsvp, i) => {
-    const div = document.createElement('div');
-    div.className = 'player-item flex items-center gap-2.5 text-sm text-gray-300';
-    div.style.animationDelay = `${i * 0.05}s`;
-    div.innerHTML = `
-      <span class="w-5 h-5 rounded-full bg-green-500/15 flex items-center justify-center shrink-0">
-        <svg class="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-      </span>
-      ${escapeHtml(rsvp.player_name)}`;
-    playerList.appendChild(div);
-  });
+  if (count > 0) {
+    const summary = document.createElement('p');
+    summary.className = 'text-sm text-gray-500';
+    summary.textContent = `${count} confirmed player${count !== 1 ? 's' : ''}`;
+    playerList.appendChild(summary);
+  }
 }
 
-// Real-time RSVP subscription
+// Public signup page does not subscribe to or read rsvps rows directly. Keep
+// the count fresh by polling the safe aggregate RPC instead of exposing names.
 function subscribeToRSVPs() {
-  if (!currentSession) return;
-  db.channel('rsvps-changes')
-    .on('postgres_changes', {
-      event: '*', schema: 'public', table: 'rsvps',
-      filter: `session_id=eq.${currentSession.id}`,
-    }, () => { loadRSVPs(); })
-    .subscribe();
+  if (rsvpCountInterval) clearInterval(rsvpCountInterval);
+  rsvpCountInterval = setInterval(loadRSVPs, 30000);
 }
 
 function escapeHtml(str) {
@@ -466,25 +450,10 @@ document.getElementById('share-btn').addEventListener('click', async () => {
 });
 
 // ---- Team Randomizer ----
-let currentRSVPs = [];
-
+// Disabled on the public signup page because public RLS intentionally does not
+// expose RSVP player names. Team assignment belongs in an authenticated surface.
 document.getElementById('randomize-btn').addEventListener('click', () => {
-  if (currentRSVPs.length < 3) return;
-
-  const shuffled = [...currentRSVPs].sort(() => Math.random() - 0.5);
-  const size = Math.ceil(shuffled.length / 3);
-  const team1 = shuffled.slice(0, size);
-  const team2 = shuffled.slice(size, size * 2);
-  const team3 = shuffled.slice(size * 2);
-
-  document.getElementById('teams-display').classList.remove('hidden');
-
-  document.getElementById('team-1').innerHTML = team1
-    .map(r => `<p class="text-sm text-orange-300">${escapeHtml(r.player_name)}</p>`).join('');
-  document.getElementById('team-2').innerHTML = team2
-    .map(r => `<p class="text-sm text-blue-300">${escapeHtml(r.player_name)}</p>`).join('');
-  document.getElementById('team-3').innerHTML = team3
-    .map(r => `<p class="text-sm text-green-300">${escapeHtml(r.player_name)}</p>`).join('');
+  showToast('Team randomizer is private for confirmed players.', 'error');
 });
 
 // ---- PWA Install ----
