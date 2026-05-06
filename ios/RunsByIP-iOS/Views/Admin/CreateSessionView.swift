@@ -8,7 +8,7 @@ struct CreateSessionView: View {
     @State private var time = Date()
     @State private var location = ""
     @State private var maxPlayers = 15
-    @State private var priceDollars = 10
+    @State private var priceDollars = 12
     @State private var isLoading = false
     @State private var errorMessage: String?
 
@@ -115,7 +115,7 @@ struct CreateSessionView: View {
                                     .foregroundColor(.appAccentOrange)
                                     .font(.title3.bold())
 
-                                TextField("10", value: $priceDollars, format: .number)
+                                TextField("12", value: $priceDollars, format: .number)
                                     .keyboardType(.numberPad)
                                     .font(.title3.bold())
                                     .foregroundColor(.white)

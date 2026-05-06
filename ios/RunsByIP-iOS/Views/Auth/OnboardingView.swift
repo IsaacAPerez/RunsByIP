@@ -122,7 +122,7 @@ struct OnboardingView: View {
                 .foregroundColor(.appTextSecondary)
 
             VStack(spacing: AppSpacing.space24) {
-                OnboardingStep(number: "1", text: "RSVP & pay $10")
+                OnboardingStep(number: "1", text: "RSVP & pay $12")
                 OnboardingStep(number: "2", text: "Show up and hoop")
                 OnboardingStep(number: "3", text: "Every Wednesday night")
             }

@@ -177,7 +177,7 @@ struct SessionDetailView: View {
             date: "2026-03-28",
             time: "6:00 PM",
             location: "Pan Pacific Park",
-            priceCents: 1000,
+            priceCents: 1200,
             minPlayers: 10,
             maxPlayers: 15,
             status: "open",
