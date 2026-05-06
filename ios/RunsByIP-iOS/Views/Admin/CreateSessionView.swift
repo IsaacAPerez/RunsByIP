@@ -8,7 +8,7 @@ struct CreateSessionView: View {
     @State private var time = Date()
     @State private var location = ""
     @State private var maxPlayers = 15
-    @State private var priceDollars = 12
+    @State private var defaultPriceCents: Int?
     @State private var isLoading = false
     @State private var errorMessage: String?
 
@@ -22,6 +22,14 @@ struct CreateSessionView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: date)
+    }
+
+    private var priceDescription: String {
+        if let defaultPriceCents {
+            return "\(defaultPriceCents.currencyDisplay) per player, from the Supabase session price default."
+        }
+
+        return "Uses the Supabase session price default when this run is created."
     }
 
     var body: some View {
@@ -110,23 +118,17 @@ struct CreateSessionView: View {
                                 .font(.subheadline.bold())
                                 .foregroundColor(.appTextSecondary)
 
-                            HStack {
-                                Text("$")
-                                    .foregroundColor(.appAccentOrange)
-                                    .font(.title3.bold())
-
-                                TextField("12", value: $priceDollars, format: .number)
-                                    .keyboardType(.numberPad)
-                                    .font(.title3.bold())
-                                    .foregroundColor(.white)
-                            }
-                            .padding()
-                            .background(Color.appSurface)
-                            .cornerRadius(10)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.appBorder, lineWidth: 1)
-                            )
+                            Text(priceDescription)
+                                .font(.subheadline)
+                                .foregroundColor(.appTextSecondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding()
+                                .background(Color.appSurface)
+                                .cornerRadius(10)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.appBorder, lineWidth: 1)
+                                )
                         }
 
                         // Error
@@ -161,13 +163,21 @@ struct CreateSessionView: View {
                 }
             }
             .condensedNavTitle("New Session")
-                        .toolbar {
+            .task {
+                await loadDefaultPrice()
+            }
+            .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") { dismiss() }
                         .foregroundColor(.appAccentOrange)
                 }
             }
         }
+    }
+
+    private func loadDefaultPrice() async {
+        guard defaultPriceCents == nil else { return }
+        defaultPriceCents = try? await sessionService.defaultSessionPriceCents()
     }
 
     private func createSession() {
@@ -180,7 +190,7 @@ struct CreateSessionView: View {
                     time: timeString,
                     location: location,
                     maxPlayers: maxPlayers,
-                    priceCents: priceDollars * 100
+                    priceCents: defaultPriceCents
                 )
                 dismiss()
             } catch {

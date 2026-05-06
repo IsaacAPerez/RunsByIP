@@ -64,8 +64,16 @@ Deno.serve(async (req: Request) => {
       return json({ error: "Session is full" }, 400);
     }
 
+    const amount = Number(session.price_cents);
+    if (!Number.isInteger(amount) || amount <= 0) {
+      console.error(
+        `Invalid price_cents for session ${session_id}: ${session.price_cents}`,
+      );
+      return json({ error: "Session price is not configured" }, 500);
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: session.price_cents,
+      amount,
       currency: "usd",
       automatic_payment_methods: { enabled: true },
       receipt_email: player_email,

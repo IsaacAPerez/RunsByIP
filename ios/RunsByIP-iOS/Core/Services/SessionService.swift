@@ -302,13 +302,24 @@ final class SessionService: ObservableObject {
 
     // MARK: - Create Session
 
-    func createSession(date: String, time: String, location: String, maxPlayers: Int, priceCents: Int) async throws {
+    func defaultSessionPriceCents() async throws -> Int {
+        do {
+            return try await supabase
+                .rpc("default_session_price_cents")
+                .execute()
+                .value
+        } catch {
+            throw AppError.networkError(error.localizedDescription)
+        }
+    }
+
+    func createSession(date: String, time: String, location: String, maxPlayers: Int, priceCents: Int? = nil) async throws {
         struct NewSession: Encodable {
             let date: String
             let time: String
             let location: String
             let maxPlayers: Int
-            let priceCents: Int
+            let priceCents: Int?
             let status: String
 
             enum CodingKeys: String, CodingKey {

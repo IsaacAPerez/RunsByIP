@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.json">
   <!-- OG / Social -->
   <meta property="og:title" content="RunsByIP — Weekly Pickup Basketball">
-  <meta property="og:description" content="RSVP and pay $12 to lock in your spot. Every Wednesday in LA.">
+  <meta property="og:description" content="RSVP and pay online to lock in your spot. Every Wednesday in LA.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://runsbyip.com">
   <meta property="og:image" content="https://runsbyip.com/og-image.jpg">
@@ -21,7 +21,7 @@
   <meta property="og:image:height" content="900">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="RunsByIP — Weekly Pickup Basketball">
-  <meta name="twitter:description" content="RSVP and pay $12 to lock in your spot. Every Wednesday in LA.">
+  <meta name="twitter:description" content="RSVP and pay online to lock in your spot. Every Wednesday in LA.">
   <meta name="twitter:image" content="https://runsbyip.com/og-image.jpg">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -127,7 +127,7 @@
               <p class="quick-label">Consistent Wednesday cadence, not random last-minute chaos.</p>
             </div>
             <div class="quick-card">
-              <p class="quick-value">$12</p>
+              <p id="quick-price" class="quick-value">Session price</p>
               <p class="quick-label">One clean RSVP flow to lock in your spot.</p>
             </div>
             <div class="quick-card quick-card-wide">
@@ -170,6 +170,12 @@
         function fmtDate(d){
           var dt=new Date(d+'T00:00:00');
           return dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+        }
+
+        function fmtPrice(cents){
+          var dollars=Number(cents)/100;
+          if(!Number.isFinite(dollars)||dollars<0)return 'Session price';
+          return Number.isInteger(dollars)?'$'+dollars.toFixed(0):'$'+dollars.toFixed(2);
         }
 
         function copyLink(btn){
@@ -240,7 +246,7 @@
                 +'<p style="font-size:14px;color:#666666;margin:0 0 16px;">'+s.time+' &middot; '+s.location+'</p>'
                 +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">'
                 +'<span style="font-size:14px;color:#666666;">'+count+'/'+s.max_players+' confirmed</span>'
-                +'<span style="font-size:14px;font-weight:600;color:#fff;">$'+(s.price_cents/100)+'</span>'
+                +'<span style="font-size:14px;font-weight:600;color:#fff;">'+fmtPrice(s.price_cents)+'</span>'
                 +'</div>'
                 +'<button id="copy-link-btn" style="width:100%;text-align:center;background:#FFFFFF;color:#000000;font-weight:700;padding:14px;border-radius:14px;border:none;font-size:14px;cursor:pointer;text-transform:uppercase;letter-spacing:0.05em;">Copy Link</button>'
                 +'<p style="text-align:center;color:#666666;font-size:12px;margin-top:8px;">Paste in Safari to RSVP & pay</p>'
@@ -281,7 +287,7 @@
       <div class="bg-surface rounded-2xl ticket-border p-5 sm:p-6">
         <div class="flex items-start justify-between mb-4">
           <span id="session-status-badge" class="px-3 py-1 rounded-xl text-xs font-semibold uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20">Open</span>
-          <span id="session-price" class="text-2xl font-display font-bold text-brand">$12</span>
+          <span id="session-price" class="text-2xl font-display font-bold text-brand">—</span>
         </div>
         <h2 id="session-date" class="text-2xl sm:text-3xl font-display font-bold mb-3 tracking-tight uppercase"></h2>
         <div class="space-y-2 mb-5">
@@ -406,7 +412,7 @@
       <!-- Checkout: Open State -->
       <div id="checkout-section" class="hidden bg-surface rounded-2xl border border-surface-light p-5 sm:p-6">
         <h3 class="font-display font-bold text-lg mb-1 uppercase tracking-wide">Reserve Your Spot</h3>
-        <p class="text-sm text-muted mb-5">Enter your details and pay $12 to lock in.</p>
+        <p id="checkout-copy" class="text-sm text-muted mb-5">Enter your details and pay the session price to lock in.</p>
         <div class="space-y-4">
           <div>
             <label for="player-name" class="block text-sm font-medium text-muted mb-2 uppercase tracking-wider">Name</label>
@@ -432,9 +438,9 @@
         <p id="payment-error" class="text-red-400 text-sm mt-4 hidden"></p>
         <button id="pay-btn"
           class="w-full mt-5 bg-brand active:bg-white/90 text-black font-bold py-4 rounded-xl transition-all text-sm uppercase tracking-widest">
-          RSVP & Pay $12
+          RSVP & Pay
         </button>
-        <p class="text-xs text-muted-dark text-center mt-3">Refunds available — $11 of $12 returned. See <a href="#refund-policy" class="underline hover:text-muted">policy</a>.</p>
+        <p id="refund-teaser" class="text-xs text-muted-dark text-center mt-3">Refunds available — session price minus the processing fee. See <a href="#refund-policy" class="underline hover:text-muted">policy</a>.</p>
       </div>
 
       <!-- Session Full -->
@@ -491,15 +497,15 @@
     <div class="max-w-4xl mx-auto px-5 lg:px-8 py-10 sm:py-12">
       <h3 class="font-display font-bold text-lg sm:text-xl mb-4 uppercase tracking-wide">Refund Policy</h3>
       <div class="text-gray-500 text-sm sm:text-base leading-relaxed max-w-xl space-y-3">
-        <p>All refunds are <strong class="text-white">$11 of your $12</strong>. The $1 difference covers non-recoverable processing fees.</p>
+        <p id="refund-policy-intro">All refunds are the session price minus <strong class="text-white">$1</strong>. The difference covers non-recoverable processing fees.</p>
         <ul class="space-y-2">
           <li class="flex items-start gap-2">
             <span class="text-gray-600 shrink-0">&#8226;</span>
-            <span>Can't make it? No worries — you get <strong class="text-white">$11 back</strong>.</span>
+            <span id="refund-policy-player">Can't make it? No worries — you get the session price minus the processing fee back.</span>
           </li>
           <li class="flex items-start gap-2">
             <span class="text-gray-600 shrink-0">&#8226;</span>
-            <span>Session cancelled by us? You still get <strong class="text-white">$11 back</strong>.</span>
+            <span id="refund-policy-cancelled">Session cancelled by us? You still get the session price minus the processing fee back.</span>
           </li>
           <li class="flex items-start gap-2">
             <span class="text-gray-600 shrink-0">&#8226;</span>

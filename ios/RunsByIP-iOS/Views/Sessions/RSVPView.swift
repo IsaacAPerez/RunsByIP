@@ -975,7 +975,7 @@ private extension Substring {
         date: "2026-03-28",
         time: "6:00 PM",
         location: "Pan Pacific Park",
-        priceCents: 1200,
+        priceCents: 0,
         minPlayers: 10,
         maxPlayers: 15,
         status: "open",

@@ -42,7 +42,7 @@ struct ColorPreviewView: View {
 
                         // Button preview
                         HStack(spacing: 12) {
-                            Text("RSVP — $12")
+                            Text("RSVP — PRICE")
                                 .font(.system(size: 15, weight: .black))
                                 .tracking(1.0)
                                 .frame(maxWidth: .infinity)

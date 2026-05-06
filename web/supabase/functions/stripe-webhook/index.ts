@@ -89,19 +89,51 @@ Deno.serve(async (req: Request) => {
       };
 
       if (!result.inserted) {
-        // Session filled while this payment was in flight. Refund the charge
-        // so the user isn't debited for a spot they didn't get.
+        // Session filled while this payment was in flight. Refund according to
+        // the session's Supabase-backed price: session price minus the $1 fee.
+        const { data: session, error: sessionError } = await supabase
+          .from("sessions")
+          .select("price_cents")
+          .eq("id", session_id)
+          .single();
+
+        if (sessionError || !session) {
+          console.error(
+            `Unable to load session ${session_id} price for refund:`,
+            sessionError,
+          );
+          return new Response(
+            JSON.stringify({ error: "Refund price lookup failed; will retry" }),
+            { status: 500 },
+          );
+        }
+
+        const refundAmount = Number(session.price_cents) - 100;
+        if (!Number.isInteger(refundAmount) || refundAmount <= 0) {
+          console.error(
+            `Invalid refund amount for session ${session_id}: price_cents=${session.price_cents}`,
+          );
+          return new Response(
+            JSON.stringify({ error: "Invalid refund amount; will retry" }),
+            { status: 500 },
+          );
+        }
+
         console.warn(
-          `Session ${session_id} full (${result.confirmed_count}/${result.max_players}) — refunding PaymentIntent ${paymentIntent.id}`,
+          `Session ${session_id} full (${result.confirmed_count}/${result.max_players}) — refunding ${refundAmount} cents for PaymentIntent ${paymentIntent.id}`,
         );
 
         try {
           await stripe.refunds.create({
             payment_intent: paymentIntent.id,
+            amount: refundAmount,
             reason: "requested_by_customer",
             metadata: {
               refund_reason: "session_full",
               session_id,
+              session_price_cents: String(session.price_cents),
+              refund_amount_cents: String(refundAmount),
+              retained_fee_cents: "100",
             },
           });
         } catch (refundErr) {

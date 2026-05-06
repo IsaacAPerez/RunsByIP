@@ -269,7 +269,22 @@ extension GameSession {
     }
 
     var priceDisplay: String {
-        "$\(priceCents / 100)"
+        priceCents.currencyDisplay
+    }
+
+    var refundDisplayAfterRunsFee: String {
+        max(priceCents - 100, 0).currencyDisplay
+    }
+}
+
+extension Int {
+    var currencyDisplay: String {
+        let amount = Decimal(self) / Decimal(100)
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = "USD"
+        formatter.maximumFractionDigits = self.isMultiple(of: 100) ? 0 : 2
+        return formatter.string(from: amount as NSDecimalNumber) ?? "USD \(amount)"
     }
 }
 

@@ -7,6 +7,7 @@ const headerActions = document.getElementById('header-actions');
 const loginForm = document.getElementById('login-form');
 const loginError = document.getElementById('login-error');
 const createSessionForm = document.getElementById('create-session-form');
+const priceInput = document.getElementById('new-session-price');
 const sessionsList = document.getElementById('sessions-list');
 const toast = document.getElementById('toast');
 
@@ -28,11 +29,43 @@ function showToast(message, type = 'success') {
 }
 
 // Show dashboard
-function showDashboard() {
+async function showDashboard() {
   loginSection.classList.add('hidden');
   dashboard.classList.remove('hidden');
   headerActions.classList.remove('hidden');
+  await loadSessionPriceDefault();
   loadSessions();
+}
+
+function formatPriceInputValue(cents) {
+  const amount = Number(cents) / 100;
+  if (!Number.isFinite(amount) || amount <= 0) return '';
+  return Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
+}
+
+// Pre-fill create-session price from the Supabase-backed default. There is no
+// static dollar fallback here: if the RPC fails or returns invalid data, admins
+// must enter one explicitly.
+async function loadSessionPriceDefault() {
+  priceInput.value = '';
+  priceInput.placeholder = 'Loading default price…';
+
+  const { data: defaultPriceCents, error } = await db.rpc('default_session_price_cents');
+
+  if (error) {
+    console.warn('Failed to load default session price:', error);
+    priceInput.placeholder = 'Enter price manually';
+    return;
+  }
+
+  const defaultPrice = formatPriceInputValue(defaultPriceCents);
+  if (defaultPrice) {
+    priceInput.value = defaultPrice;
+    priceInput.placeholder = 'Default session price';
+  } else {
+    console.warn('Invalid default session price:', defaultPriceCents);
+    priceInput.placeholder = 'Enter price manually';
+  }
 }
 
 // Format date for display
@@ -48,7 +81,7 @@ function formatDate(dateStr) {
 // Check existing auth session
 async function checkAuth() {
   const { data: { session } } = await db.auth.getSession();
-  if (session) showDashboard();
+  if (session) await showDashboard();
 }
 
 // Login
@@ -67,7 +100,7 @@ loginForm.addEventListener('submit', async (e) => {
     return;
   }
 
-  showDashboard();
+  await showDashboard();
 });
 
 // Logout
@@ -249,14 +282,20 @@ createSessionForm.addEventListener('submit', async (e) => {
   const time = document.getElementById('new-session-time').value;
   const location = document.getElementById('new-session-location').value;
   const maxPlayers = parseInt(document.getElementById('new-session-max-players').value, 10);
-  const priceDollars = parseInt(document.getElementById('new-session-price').value, 10);
+  const priceDollars = Number(document.getElementById('new-session-price').value);
+  const priceCents = Math.round(priceDollars * 100);
+
+  if (!Number.isFinite(priceCents) || priceCents <= 0) {
+    showToast('Enter a valid session price', 'error');
+    return;
+  }
 
   const { error } = await db.from('sessions').insert({
     date,
     time,
     location,
     max_players: maxPlayers,
-    price_cents: priceDollars * 100,
+    price_cents: priceCents,
     status: 'open',
   });
 

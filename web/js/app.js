@@ -15,6 +15,12 @@ const sessionDate = document.getElementById('session-date');
 const sessionTime = document.getElementById('session-time');
 const sessionLocation = document.getElementById('session-location');
 const sessionPrice = document.getElementById('session-price');
+const quickPrice = document.getElementById('quick-price');
+const checkoutCopy = document.getElementById('checkout-copy');
+const refundTeaser = document.getElementById('refund-teaser');
+const refundPolicyIntro = document.getElementById('refund-policy-intro');
+const refundPolicyPlayer = document.getElementById('refund-policy-player');
+const refundPolicyCancelled = document.getElementById('refund-policy-cancelled');
 const sessionStatusBadge = document.getElementById('session-status-badge');
 const rsvpCount = document.getElementById('rsvp-count');
 const rsvpProgress = document.getElementById('rsvp-progress');
@@ -59,6 +65,39 @@ const stripeAppearance = {
 function formatDate(dateStr) {
   const date = new Date(dateStr + 'T00:00:00');
   return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+}
+
+function formatPriceFromCents(cents) {
+  const dollars = Number(cents) / 100;
+  if (!Number.isFinite(dollars) || dollars < 0) return '';
+  return Number.isInteger(dollars) ? `$${dollars.toFixed(0)}` : `$${dollars.toFixed(2)}`;
+}
+
+function updatePriceCopy() {
+  if (!currentSession) return;
+  const priceCents = Number(currentSession.price_cents);
+  if (!Number.isFinite(priceCents)) return;
+
+  const price = formatPriceFromCents(priceCents);
+  const refund = formatPriceFromCents(Math.max(priceCents - 100, 0));
+
+  sessionPrice.textContent = price;
+  if (quickPrice) quickPrice.textContent = price;
+  if (checkoutCopy) checkoutCopy.textContent = `Enter your details and pay ${price} to lock in.`;
+  payBtn.textContent = `RSVP & Pay ${price}`;
+
+  if (refundTeaser) {
+    refundTeaser.innerHTML = `Refunds available — ${refund} of ${price} returned. See <a href="#refund-policy" class="underline hover:text-muted">policy</a>.`;
+  }
+  if (refundPolicyIntro) {
+    refundPolicyIntro.innerHTML = `All refunds are <strong class="text-white">${refund} of your ${price}</strong>. The $1 difference covers non-recoverable processing fees.`;
+  }
+  if (refundPolicyPlayer) {
+    refundPolicyPlayer.innerHTML = `Can't make it? No worries — you get <strong class="text-white">${refund} back</strong>.`;
+  }
+  if (refundPolicyCancelled) {
+    refundPolicyCancelled.innerHTML = `Session cancelled by us? You still get <strong class="text-white">${refund} back</strong>.`;
+  }
 }
 
 // Show a specific view, hide others
@@ -181,7 +220,7 @@ function isValidEmail(email) {
 function mountPaymentForm() {
   elements = stripe.elements({
     mode: 'payment',
-    amount: currentSession.price_cents,
+    amount: Number(currentSession.price_cents),
     currency: 'usd',
     appearance: stripeAppearance,
   });
@@ -232,7 +271,7 @@ async function handlePayment() {
       paymentError.textContent = submitError.message;
       paymentError.classList.remove('hidden');
       payBtn.disabled = false;
-      payBtn.textContent = `RSVP & Pay $${(currentSession.price_cents / 100).toFixed(0)}`;
+      updatePriceCopy();
       return;
     }
 
@@ -271,7 +310,7 @@ async function handlePayment() {
   }
 
   payBtn.disabled = false;
-  payBtn.textContent = `RSVP & Pay $${(currentSession.price_cents / 100).toFixed(0)}`;
+  updatePriceCopy();
 }
 
 // Pay button
@@ -324,7 +363,7 @@ async function loadSession() {
   sessionDate.textContent = formatDate(currentSession.date);
   sessionTime.textContent = currentSession.time;
   sessionLocation.textContent = currentSession.location;
-  sessionPrice.textContent = `$${(currentSession.price_cents / 100).toFixed(0)}`;
+  updatePriceCopy();
 
   sessionStatusBadge.textContent = 'Open';
   sessionStatusBadge.className =
@@ -359,7 +398,12 @@ function subscribeToSession() {
       event: 'UPDATE', schema: 'public', table: 'sessions',
       filter: `id=eq.${currentSession.id}`,
     }, (payload) => {
+      const previousPriceCents = Number(currentSession.price_cents);
       currentSession = payload.new;
+      updatePriceCopy();
+      if (elements && typeof elements.update === 'function' && Number(currentSession.price_cents) !== previousPriceCents) {
+        elements.update({ amount: Number(currentSession.price_cents) });
+      }
       updatePaymentsState();
     })
     .subscribe();
